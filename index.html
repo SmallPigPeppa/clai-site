@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Continual Learning for AI</title>
+<meta name="description" content="持续学习的背景、问题设定、关键挑战与评价指标，以及 CLightning、CLAgent 与 CLOCR 研究项目与统一的 CL 矩阵评测口径。">
+<meta property="og:title" content="Continual Learning for AI">
+<meta property="og:description" content="持续学习的背景、问题设定、关键挑战与评价指标，以及 CLightning、CLAgent 与 CLOCR 研究项目与统一的 CL 矩阵评测口径。">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='1 0.4 18 17.2'><rect x='1' y='13' width='4.6' height='4.6' rx='1.1' fill='%232F4CD8'/><rect x='7.7' y='13' width='4.6' height='4.6' rx='1.1' fill='%232F4CD8'/><rect x='14.4' y='13' width='4.6' height='4.6' rx='1.1' fill='%232F4CD8'/><rect x='1' y='6.7' width='4.6' height='4.6' rx='1.1' fill='%236B8EE9'/><rect x='7.7' y='6.7' width='4.6' height='4.6' rx='1.1' fill='%236B8EE9'/><rect x='1' y='.4' width='4.6' height='4.6' rx='1.1' fill='%23A8C4F3'/></svg>">
+<link rel="stylesheet" href="./assets/site.css?v=64629d96">
+<script>
+  // 在首次绘制前定主题，避免闪白
+  (() => {
+    try {
+      const saved = localStorage.getItem('cl-theme');
+      if (saved === 'dark' || saved === 'light') document.documentElement.dataset.theme = saved;
+    } catch (e) { /* 隐私模式下 localStorage 不可用 */ }
+  })();
+</script>
+</head>
+<body data-nav="home" data-base="./">
+
+<!-- 氛围层：整页身后的辉光与颗粒，玻璃靠它显形 -->
+<div class="aura" aria-hidden="true"></div>
+
+<a class="skip" href="#main">跳到主要内容</a>
+
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4.5 12h15M13 5.5l6.5 6.5-6.5 6.5"/>
+  </symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 9.5l6 6 6-6"/>
+  </symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4L20 20"/>
+  </symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4.2"/>
+    <path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/>
+  </symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.5 14.3A8.8 8.8 0 1 1 9.7 3.5a7 7 0 0 0 10.8 10.8Z"/>
+  </symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+    <path d="M3.5 7h17M3.5 12h17M3.5 17h17"/>
+  </symbol>
+  <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+    <path d="M6 6l12 12M18 6L6 18"/>
+  </symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="8.5" y="8.5" width="11" height="11" rx="2.2"/>
+    <path d="M15.5 5.5A2 2 0 0 0 13.5 4h-7a2.5 2.5 0 0 0-2.5 2.5v7a2 2 0 0 0 1.5 1.94"/>
+  </symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4.5 12.5l5 5 10-11"/>
+  </symbol>
+  <symbol id="i-github" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 .5C5.7.5.6 5.6.6 11.9c0 5.05 3.27 9.33 7.81 10.84.57.11.78-.25.78-.55 0-.27-.01-1.17-.02-2.12-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.17-3.07-.12-.29-.51-1.45.11-3.03 0 0 .96-.31 3.15 1.17a10.9 10.9 0 0 1 5.74 0c2.18-1.48 3.14-1.17 3.14-1.17.62 1.58.23 2.74.12 3.03.73.8 1.17 1.82 1.17 3.07 0 4.39-2.68 5.36-5.23 5.64.41.36.78 1.06.78 2.13 0 1.54-.01 2.79-.01 3.16 0 .31.2.67.79.55a11.42 11.42 0 0 0 7.8-10.84C23.4 5.6 18.3.5 12 .5Z"/>
+  </symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13.5 4.5h6v6M19 5l-7.2 7.2M9.5 5.5H7A2.5 2.5 0 0 0 4.5 8v9A2.5 2.5 0 0 0 7 19.5h9a2.5 2.5 0 0 0 2.5-2.5v-2.5"/>
+  </symbol>
+  <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 4.8A1.8 1.8 0 0 1 5.8 3H11v16H5.8A1.8 1.8 0 0 0 4 20.8V4.8ZM20 4.8A1.8 1.8 0 0 0 18.2 3H13v16h5.2a1.8 1.8 0 0 1 1.8 1.8V4.8Z"/>
+  </symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3.5" y="3.5" width="17" height="17" rx="2"/>
+    <path d="M3.5 9.17h17M3.5 14.83h17M9.17 3.5v17M14.83 3.5v17"/>
+  </symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3l8.5 4.5L12 12 3.5 7.5 12 3ZM3.5 12.2 12 16.7l8.5-4.5M3.5 16.7 12 21.2l8.5-4.5"/>
+  </symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 20V4M4 20h16M8 20v-6M12.7 20V9M17.3 20v-9.5"/>
+  </symbol>
+  <symbol id="i-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="4.5" width="18" height="15" rx="2.2"/><path d="M7.5 10l3 2.8-3 2.8M13 15.8h4"/>
+  </symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9.5 3v6.2L4.6 17.4A2 2 0 0 0 6.3 20.5h11.4a2 2 0 0 0 1.7-3.1L14.5 9.2V3M8 3h8M7.2 14.5h9.6"/>
+  </symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13.5 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5L13.5 3Z"/>
+    <path d="M13.3 3.2v5.3H19M8.8 13h6.4M8.8 16.7h4.4"/>
+  </symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 11.5A7.5 7.5 0 0 1 17.4 6.8M20 12.5A7.5 7.5 0 0 1 6.6 17.2"/>
+    <path d="M17.6 3.4v3.6H14M6.4 20.6V17H10"/>
+  </symbol>
+</svg>
+<header class="site-head" id="site-head">
+  <div class="shell head-inner">
+
+    <a class="brand" href="./" aria-label="Continual Learning for AI 首页">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="1 0.4 18 17.2" width="22" height="21">
+          <rect class="m-deep" x="1"    y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-deep" x="7.7"  y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-deep" x="14.4" y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-mid"  x="1"    y="6.7" width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-mid"  x="7.7"  y="6.7" width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-lite" x="1"    y=".4"  width="4.6" height="4.6" rx="1.1"/>
+        </svg>
+      </span>
+      <svg class="wordmark" viewBox="45 -756 11439 964" aria-hidden="true" focusable="false">
+        <path class="wm-main" d="M332 14Q204 14 129 -58Q53 -131 53 -267V-433Q53 -569 129 -642Q204 -714 332 -714Q460 -714 529 -644Q598 -574 598 -452V-446H484V-456Q484 -524 447 -567Q410 -611 332 -611Q256 -611 212 -564Q169 -517 169 -435V-265Q169 -184 212 -137Q256 -89 332 -89Q410 -89 447 -133Q484 -177 484 -244V-262H598V-248Q598 -126 529 -56Q460 14 332 14Z M946 14Q872 14 814 -16Q756 -47 723 -104Q689 -160 689 -239V-254Q689 -333 723 -390Q756 -447 814 -477Q872 -508 946 -508Q1020 -508 1078 -477Q1136 -447 1169 -390Q1203 -333 1203 -254V-239Q1203 -160 1169 -104Q1136 -47 1078 -16Q1020 14 946 14ZM946 -84Q1011 -84 1052 -125Q1093 -167 1093 -242V-252Q1093 -326 1052 -368Q1012 -410 946 -410Q881 -410 840 -368Q799 -326 799 -252V-242Q799 -167 840 -125Q881 -84 946 -84Z M1323 0V-494H1431V-422H1448Q1461 -452 1496 -477Q1531 -502 1601 -502Q1658 -502 1701 -477Q1745 -451 1769 -405Q1794 -359 1794 -296V0H1684V-287Q1684 -349 1654 -379Q1623 -409 1568 -409Q1506 -409 1470 -368Q1433 -326 1433 -250V0Z M2107 0Q2060 0 2033 -28Q2005 -56 2005 -103V-402H1873V-494H2005V-654H2115V-494H2259V-402H2115V-122Q2115 -92 2143 -92H2244V0Z M2373 0V-494H2483V0Z M2628 0V-494H2736V-422H2753Q2766 -452 2801 -477Q2836 -502 2906 -502Q2963 -502 3006 -477Q3050 -451 3074 -405Q3099 -359 3099 -296V0H2989V-287Q2989 -349 2959 -379Q2928 -409 2873 -409Q2811 -409 2775 -368Q2738 -326 2738 -250V0Z M3420 8Q3363 8 3320 -17Q3276 -42 3251 -89Q3227 -135 3227 -198V-494H3337V-206Q3337 -144 3367 -115Q3398 -85 3453 -85Q3515 -85 3551 -126Q3588 -167 3588 -244V-494H3697V0H3590V-71H3573Q3560 -43 3525 -17Q3490 8 3420 8Z M3995 14Q3943 14 3901 -4Q3859 -23 3835 -58Q3810 -93 3810 -143Q3810 -194 3835 -227Q3859 -261 3902 -278Q3945 -296 3999 -296H4146V-326Q4146 -367 4121 -392Q4096 -417 4043 -417Q3992 -417 3966 -393Q3939 -369 3931 -331L3829 -364Q3841 -404 3867 -436Q3894 -468 3938 -488Q3982 -508 4045 -508Q4142 -508 4197 -459Q4252 -410 4252 -319V-121Q4252 -91 4280 -91H4322V0H4243Q4207 0 4185 -18Q4162 -36 4162 -67V-69H4146Q4139 -55 4124 -35Q4108 -15 4077 -1Q4047 14 3995 14ZM4013 -76Q4072 -76 4109 -110Q4146 -144 4146 -201V-212H4006Q3967 -212 3944 -195Q3920 -178 3920 -146Q3920 -114 3945 -95Q3969 -76 4013 -76Z M4415 0V-700H4525V0Z M4820 0V-700H4935V-105H5267V0Z M5587 14Q5513 14 5456 -18Q5400 -49 5369 -106Q5337 -164 5337 -241V-253Q5337 -330 5368 -387Q5399 -445 5455 -476Q5511 -508 5584 -508Q5655 -508 5709 -476Q5763 -445 5793 -388Q5823 -331 5823 -256V-216H5449Q5451 -155 5491 -119Q5531 -82 5590 -82Q5647 -82 5675 -107Q5703 -132 5717 -164L5808 -118Q5794 -90 5768 -59Q5741 -29 5698 -7Q5654 14 5587 14ZM5450 -299H5711Q5707 -351 5673 -381Q5638 -411 5583 -411Q5527 -411 5492 -381Q5458 -351 5450 -299Z M6092 14Q6040 14 5998 -4Q5956 -23 5932 -58Q5907 -93 5907 -143Q5907 -194 5932 -227Q5956 -261 5999 -278Q6042 -296 6096 -296H6243V-326Q6243 -367 6218 -392Q6193 -417 6140 -417Q6089 -417 6063 -393Q6036 -369 6028 -331L5926 -364Q5938 -404 5964 -436Q5991 -468 6035 -488Q6079 -508 6142 -508Q6239 -508 6294 -459Q6349 -410 6349 -319V-121Q6349 -91 6377 -91H6419V0H6340Q6304 0 6282 -18Q6259 -36 6259 -67V-69H6243Q6236 -55 6221 -35Q6205 -15 6174 -1Q6144 14 6092 14ZM6110 -76Q6169 -76 6206 -110Q6243 -144 6243 -201V-212H6103Q6064 -212 6041 -195Q6017 -178 6017 -146Q6017 -114 6042 -95Q6066 -76 6110 -76Z M6512 0V-494H6620V-436H6637Q6649 -467 6674 -481Q6700 -496 6738 -496H6797V-397H6735Q6685 -397 6654 -370Q6622 -344 6622 -287V0Z M6897 0V-494H7005V-422H7022Q7035 -452 7070 -477Q7105 -502 7175 -502Q7232 -502 7275 -477Q7319 -451 7343 -405Q7368 -359 7368 -296V0H7258V-287Q7258 -349 7228 -379Q7197 -409 7142 -409Q7080 -409 7044 -368Q7007 -326 7007 -250V0Z M7508 0V-494H7618V0Z M7763 0V-494H7871V-422H7888Q7901 -452 7936 -477Q7971 -502 8041 -502Q8098 -502 8141 -477Q8185 -451 8209 -405Q8234 -359 8234 -296V0H8124V-287Q8124 -349 8094 -379Q8063 -409 8008 -409Q7946 -409 7910 -368Q7873 -326 7873 -250V0Z M8350 -245V-260Q8350 -338 8382 -393Q8413 -448 8465 -478Q8516 -508 8578 -508Q8649 -508 8687 -482Q8724 -456 8741 -426H8758V-494H8865V97Q8865 144 8838 172Q8810 200 8763 200H8431V104H8727Q8756 104 8756 74V-75H8739Q8728 -57 8709 -39Q8690 -21 8658 -9Q8626 3 8578 3Q8516 3 8464 -27Q8412 -56 8381 -112Q8350 -167 8350 -245ZM8609 -93Q8673 -93 8715 -134Q8757 -175 8757 -248V-257Q8757 -331 8716 -371Q8674 -411 8609 -411Q8545 -411 8503 -371Q8461 -331 8461 -257V-248Q8461 -175 8503 -134Q8545 -93 8609 -93Z"/>
+        <path class="wm-dot" d="M2389 -748h78a42 42 0 0 1 42 42v78a42 42 0 0 1 -42 42h-78a42 42 0 0 1 -42 -42v-78a42 42 0 0 1 42 -42z M7524 -748h78a42 42 0 0 1 42 42v78a42 42 0 0 1 -42 42h-78a42 42 0 0 1 -42 -42v-78a42 42 0 0 1 42 -42z"/>
+        <path class="wm-for" d="M9271 0V-420H9121V-489H9271V-614Q9271 -654 9294 -677Q9316 -700 9358 -700H9481V-632H9380Q9350 -632 9350 -602V-489H9504V-420H9350V0Z M9821 14Q9747 14 9690 -17Q9634 -48 9602 -105Q9571 -161 9571 -238V-251Q9571 -327 9602 -384Q9634 -441 9690 -472Q9747 -503 9821 -503Q9895 -503 9951 -472Q10008 -441 10039 -384Q10071 -327 10071 -251V-238Q10071 -161 10039 -105Q10008 -48 9951 -17Q9895 14 9821 14ZM9821 -57Q9899 -57 9945 -106Q9992 -156 9992 -240V-249Q9992 -333 9945 -383Q9899 -432 9821 -432Q9744 -432 9697 -383Q9650 -333 9650 -249V-240Q9650 -156 9697 -106Q9744 -57 9821 -57Z M10215 0V-489H10292V-429H10306Q10319 -461 10346 -476Q10373 -491 10417 -491H10475V-419H10412Q10359 -419 10326 -389Q10294 -360 10294 -298V0Z"/>
+        <path class="wm-ai" d="M10682 0 10874 -700H11083L11275 0H11151L11109 -160H10848L10806 0ZM10876 -270H11081L10987 -625H10970Z M11356 0V-700H11477V0Z"/>
+      </svg>
+      <span class="sr-only">Continual Learning for AI</span>
+    </a>
+
+    <nav class="head-nav" aria-label="主导航">
+      <a class="nav-link" data-nav-key="learn" href="./learn">背景介绍</a>
+
+      <div class="nav-group">
+        <button type="button" class="nav-link nav-trigger" data-nav-key="works evaluation leaderboard"
+                aria-expanded="false" aria-controls="menu-eval">
+          相关工作与榜单<svg class="ic caret" width="14" height="14" aria-hidden="true"><use href="#i-chevron"/></svg>
+        </button>
+        <div class="nav-menu" id="menu-eval" hidden>
+          <div class="nav-menu-grid one-col">
+            <a href="./works">
+              <svg class="ic" width="18" height="18" aria-hidden="true"><use href="#i-book"/></svg>
+              <b>相关工作</b><span>方法、奠基文献、综述、基准与工具库</span>
+            </a>
+            <a href="./leaderboard">
+              <svg class="ic" width="18" height="18" aria-hidden="true"><use href="#i-chart"/></svg>
+              <b>榜单</b><span>各问题设定下的评测口径与结果表</span>
+            </a>
+            <a href="./evaluation">
+              <svg class="ic" width="18" height="18" aria-hidden="true"><use href="#i-grid"/></svg>
+              <b>评测协议</b><span>榜单的统一口径与有效性检查</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <button type="button" class="nav-link nav-trigger" data-nav-key="libraries agent"
+                aria-expanded="false" aria-controls="menu-proj">
+          我们的项目<svg class="ic caret" width="14" height="14" aria-hidden="true"><use href="#i-chevron"/></svg>
+        </button>
+        <div class="nav-menu" id="menu-proj" hidden>
+          <div class="nav-menu-grid one-col">
+            <a href="./libraries">
+              <svg class="ic" width="18" height="18" aria-hidden="true"><use href="#i-flask"/></svg>
+              <b>CLightning</b><span>类别增量、域增量与持续指令微调方法库</span>
+            </a>
+            <a href="./agent">
+              <svg class="ic" width="18" height="18" aria-hidden="true"><use href="#i-terminal"/></svg>
+              <b>CLAgent</b><span>以持续学习为核心能力的自进化智能体系统</span>
+            </a>
+            <a href="./ocr">
+              <svg class="ic" width="18" height="18" aria-hidden="true"><use href="#i-doc"/></svg>
+              <b>CLOCR</b><span>版式、语种与年代漂移下的文字识别持续学习</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <a class="nav-link" data-nav-key="team" href="./team">团队</a>
+    </nav>
+
+    <div class="head-tools">
+      <button type="button" class="tool search-tool" id="search-open" aria-label="全站检索">
+        <svg class="ic" width="15" height="15" aria-hidden="true"><use href="#i-search"/></svg>
+        <span>搜索</span><kbd>⌘K</kbd>
+      </button>
+      <button type="button" class="tool icon-only" id="theme-toggle" aria-label="切换配色主题">
+        <svg class="ic only-light" width="17" height="17" aria-hidden="true"><use href="#i-moon"/></svg>
+        <svg class="ic only-dark" width="17" height="17" aria-hidden="true"><use href="#i-sun"/></svg>
+      </button>
+      <a class="tool icon-only repo" href="#" title="仓库地址待发布" aria-label="GitHub 仓库（待发布）">
+        <svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-github"/></svg>
+      </a>
+      <button type="button" class="tool icon-only menu-toggle" id="menu-toggle"
+              aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobile-nav">
+        <svg class="ic only-closed" width="19" height="19" aria-hidden="true"><use href="#i-menu"/></svg>
+        <svg class="ic only-open" width="19" height="19" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <nav class="mobile-nav" id="mobile-nav" aria-label="移动端导航" hidden>
+    <div class="shell">
+      <p class="m-group">背景介绍</p>
+      <a href="./learn">持续学习入门</a>
+      <p class="m-group">相关工作与榜单</p>
+      <a href="./works">相关工作</a>
+      <a href="./leaderboard">榜单</a>
+      <a href="./evaluation">评测协议</a>
+      <p class="m-group">我们的项目</p>
+      <a href="./libraries">CLightning</a>
+      <a href="./agent">CLAgent</a>
+      <a href="./ocr">CLOCR</a>
+      <p class="m-group">关于</p>
+      <a href="./team">团队</a>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+<!-- ============================ 首屏 ============================ -->
+<section class="hero">
+  <div class="shell hero-grid">
+    <div class="hero-copy">
+      <h1><em>持续学习</em><span class="en">Continual Learning</span></h1>
+      <p class="lede">
+        持续学习研究模型沿任务序列增量训练的问题：在仅能访问当前任务数据的约束下学习新任务，同时保持既有任务的性能，主要障碍是<b>灾难性遗忘</b>（catastrophic forgetting）。本站整理该方向的背景、问题设定与评测协议，维护统一口径的榜单，并开展 CLightning、CLAgent 与 CLOCR 研究项目。
+      </p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="#background">
+          背景介绍<svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-arrow"/></svg>
+        </a>
+        <a class="btn btn-secondary" href="#projects">研究项目</a>
+      </div>
+      <ul class="hero-ticker" aria-label="一个识别服务依次学习动物、交通、水果三批任务。每个阶段先到来一批各不相同的样本照片，训练后收进该任务的塔头；三座塔自上而下生长，行是阶段、列是任务，越靠上的阶段越暗，表示那批数据已不可再用、能力也在被遗忘。学完水果后，动物塔最下方的样本被误判为苹果。右侧三根柱子记录各批性能：学会时长到峰值，之后回退，曾到过的峰值留下同色淡影">
+        <li><a href="./libraries"><i class="dot" aria-hidden="true"></i><b>CLightning</b><span>方法库套件</span></a></li>
+        <li><a href="./agent"><i class="dot" aria-hidden="true"></i><b>CLAgent</b><span>智能体系统</span></a></li>
+        <li><a href="./ocr"><i class="dot" aria-hidden="true"></i><b>CLOCR</b><span>文字识别</span></a></li>
+      </ul>
+    </div>
+
+    <figure class="figure hero-fig">
+      <div class="frame frame--viz">
+        <div id="hero-scene" role="img"
+             aria-label="一个识别服务依次学习动物、交通、水果三批任务。左侧每个阶段先到来一整批样本照片，经过训练后收进该任务的塔头；三座塔自上而下生长：第一层只有动物，第二层加上交通，第三层加上水果，塔越往下是越靠后的阶段。学完水果后，动物塔最下方的样本被误判为苹果，标上红色标记。右侧三根柱子按学习先后取站标热力三档蓝：学会时由灰转蓝长到峰值，之后回退，曾到过的峰值留下同色淡影，读数与红色减量随柱顶移动"></div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<!-- ========================= 一 · 背景 ========================= -->
+<section class="section" id="background">
+  <div class="shell">
+    <div class="sec-head">
+      <p class="eyebrow eyebrow--mark">
+        <svg class="e-mark" viewBox="1 0.4 18 17.2" aria-hidden="true">
+          <rect class="m-deep"  x="1"    y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-ghost" x="7.7"  y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-ghost" x="14.4" y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-ghost" x="1"    y="6.7" width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-ghost" x="7.7"  y="6.7" width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-ghost" x="1"    y=".4"  width="4.6" height="4.6" rx="1.1"/>
+        </svg>
+        01 · 背景
+      </p>
+      <h2>从单次训练到持续学习</h2>
+      <p>
+        标准监督学习假设数据分布固定、训练一次完成。实际部署中，数据分布与任务集合随时间变化；完整重新训练的代价随模型规模增长，历史数据也常受存储与隐私约束而无法长期保留。持续学习（continual learning，又称终身学习）研究模型沿任务序列增量训练、同时保持既有任务性能的问题。
+      </p>
+    </div>
+
+    <h3 class="sub-head">研究脉络</h3>
+    <p class="sub-lede">
+      问题在不同阶段呈现不同形态：需要保持的对象从分类边界，到零样本迁移能力、指令跟随与通用能力，再到智能体的经验与技能；评测与理论随之演进。
+    </p>
+    <div class="timeline timeline--5" data-reveal>
+      <div>
+        <span class="yr">1989</span><b>问题提出</b>
+        <p>灾难性干扰在连接主义网络上被系统刻画，稳定性—可塑性两难成为领域的基本框架。</p>
+        <span class="ref">McCloskey &amp; Cohen · Grossberg</span>
+      </div>
+      <div>
+        <span class="yr">2016–2021</span><b>深度网络时代</b>
+        <p>正则化（EWC / LwF）、回放（iCaRL）与结构扩展（DER）确立方法版图，研究集中于类别增量设定。</p>
+        <span class="ref">PNAS 2017 · CVPR 2017 / 2021</span>
+      </div>
+      <div>
+        <span class="yr">2021–2023</span><b>预训练时代</b>
+        <p>冻结骨干加提示或低秩模块成为主流范式；CLIP 的零样本能力本身成为需要保持的对象。</p>
+        <span class="ref">L2P, CVPR 2022 · NMI 2022</span>
+      </div>
+      <div>
+        <span class="yr">2023–</span><b>大模型时代</b>
+        <p>持续预训练、持续指令微调与持续对齐的多阶段框架成形；需要保持的对象扩展为指令跟随与通用能力。</p>
+        <span class="ref">Wu et al. 2024 · Shi et al. 2024</span>
+      </div>
+      <div>
+        <span class="yr">2025–</span><b>智能体时代</b>
+        <p>研究对象延伸到沿任务流积累经验的智能体：持续学习从参数更新扩展到经验与技能的积累，见 <a href="./agent">CLAgent</a>。</p>
+        <span class="ref">Silver &amp; Sutton 2025</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 二 · 问题设定 ======================= -->
+<section class="section section--tint" id="settings">
+  <div class="shell">
+    <div class="sec-head">
+      <p class="eyebrow eyebrow--mark">
+        <svg class="e-mark" viewBox="1 0.4 18 17.2" aria-hidden="true">
+          <rect class="m-deep"  x="1"    y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-deep"  x="7.7"  y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-ghost" x="14.4" y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-ghost" x="1"    y="6.7" width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-ghost" x="7.7"  y="6.7" width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-ghost" x="1"    y=".4"  width="4.6" height="4.6" rx="1.1"/>
+        </svg>
+        02 · 问题设定
+      </p>
+      <h2>任务序列上的增量学习</h2>
+      <p>
+        任务 <span class="formula"><i class="var">t</i><sub>1</sub> → <i class="var">t</i><sub>2</sub> → … → <i class="var">t</i><sub><i class="var">T</i></sub></span> 依次到来；训练第 <i class="var">i</i> 个任务时仅能访问该任务的数据，历史数据至多保留有限缓存。依推理阶段是否提供任务身份、判别所在的标签空间以及数据分布的演化方式，问题划分为任务增量、数据增量、类别增量与域增量等设定<i class="cite">（van de Ven, Tuytelaars &amp; Tolias, Nat. Mach. Intell. 2022）</i>；在预训练大模型上进一步延伸出持续指令微调等形态<i class="cite">（Wu et al. 2024; Shi et al. 2024）</i>。
+      </p>
+    </div>
+
+    <figure class="setg" data-setg data-reveal
+            aria-label="五种任务设定的对照图：同一条任务序列上，各设定到来的样本、标签空间与推理时的判别范围">
+      <div class="setg-bar">
+        <span class="setg-cap">同一条任务序列</span>
+        <ol class="setg-beats">
+          <li><button type="button" data-beat="0" aria-pressed="false" aria-label="第 1 个任务">t₁</button></li>
+          <li><button type="button" data-beat="1" aria-pressed="false" aria-label="第 2 个任务">t₂</button></li>
+          <li><button type="button" data-beat="2" aria-pressed="true"  aria-label="第 3 个任务">t₃</button></li>
+        </ol>
+        <span class="setg-phase" data-phase>序列末 · 已见全部</span>
+      </div>
+
+      <div class="setg-grid" data-grid>
+        <article class="setg-card" data-set="task">
+          <p class="setg-nm"><b>任务增量</b><span class="en">Task-Incremental</span></p>
+          <div class="setg-viz" data-viz role="img"
+               aria-label="每个阶段到来两个新类的样本；推理时给定任务身份，只在该任务的两个类中判别，框可以停在任一旧任务上"></div>
+          <p class="setg-ask"><span class="sr-only">任务身份</span><b class="idm idm--given" data-id>t₁</b><span data-scope>只判 {猫, 狗}</span></p>
+          <p class="setg-bench">Split CIFAR-10</p>
+        </article>
+
+        <article class="setg-card" data-set="data">
+          <p class="setg-nm"><b>数据增量</b><span class="en">Data-Incremental</span></p>
+          <div class="setg-viz" data-viz role="img"
+               aria-label="每个阶段到来同分布的一批新样本，覆盖同样的六个类；类别固定不变，推理时始终在全部六类中判别"></div>
+          <p class="setg-ask"><span class="sr-only">任务身份</span><b class="idm idm--na" data-id>—</b><span data-scope>判全部类别</span></p>
+          <p class="setg-bench">CIFAR-10 分批</p>
+        </article>
+
+        <article class="setg-card" data-set="class">
+          <p class="setg-nm"><b>类别增量</b><span class="en">Class-Incremental</span></p>
+          <div class="setg-viz" data-viz role="img"
+               aria-label="训练流与任务增量完全相同，每个阶段到来两个新类；推理时不给任务身份，须在已见全部类中判别，判别范围随阶段扩张"></div>
+          <p class="setg-ask"><span class="sr-only">任务身份</span><b class="idm idm--infer" data-id>?</b><span data-scope>判已见类别</span></p>
+          <p class="setg-bench">Split CIFAR-100</p>
+        </article>
+
+        <article class="setg-card" data-set="domain">
+          <p class="setg-nm"><b>域增量</b><span class="en">Domain-Incremental</span></p>
+          <div class="setg-viz" data-viz role="img"
+               aria-label="每个阶段到来同样六个类在新分布下的样本，画面随域改变；标签空间不变，推理时始终在同样的六类中判别"></div>
+          <p class="setg-ask"><span class="sr-only">任务身份</span><b class="idm idm--na" data-id>—</b><span data-scope>判同样的类别</span></p>
+          <p class="setg-bench">DomainNet</p>
+        </article>
+
+        <article class="setg-card" data-set="tune">
+          <p class="setg-nm"><b>持续指令微调</b><span class="en">Continual Instruction Tuning</span></p>
+          <div class="setg-viz" data-viz role="img"
+               aria-label="每个阶段到来一个新的指令任务；既有指令能力与基座的通用能力都须保持，底部细条为通用能力相对基座的水平"></div>
+          <p class="setg-ask"><span class="sr-only">任务身份</span><b class="idm idm--na" data-id>—</b><span data-scope>任意指令 · 通用能力保持</span></p>
+          <p class="setg-bench">CoIN</p>
+        </article>
+      </div>
+
+      <figcaption class="setg-legend">
+        <span><i class="lg lg-slot"></i>上排 · 本阶段到来的样本</span>
+        <span><i class="lg lg-cell"></i>下排 · 标签空间，底条深浅为巩固程度</span>
+        <span><i class="lg lg-frame"></i>方框 · 推理时的判别范围</span>
+        <span class="setg-note">图为设定示意，样本仅用于讲解，不含实测数值</span>
+      </figcaption>
+    </figure>
+
+    <div class="link-row">
+      <a class="arrow-link" href="./learn#settings">
+        各设定的完整定义<svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-arrow"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 三 · 关键挑战 ======================= -->
+<section class="section" id="challenges">
+  <div class="shell">
+    <div class="sec-head">
+      <p class="eyebrow eyebrow--mark">
+        <svg class="e-mark" viewBox="1 0.4 18 17.2" aria-hidden="true">
+          <rect class="m-deep"  x="1"    y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-deep"  x="7.7"  y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-deep"  x="14.4" y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-ghost" x="1"    y="6.7" width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-ghost" x="7.7"  y="6.7" width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-ghost" x="1"    y=".4"  width="4.6" height="4.6" rx="1.1"/>
+        </svg>
+        03 · 关键挑战
+      </p>
+      <h2>灾难性遗忘与稳定性—可塑性两难</h2>
+      <p>
+        持续学习面临相互制约的困难：新任务的训练导致灾难性遗忘；抑制遗忘所施加的约束会损害新任务的学习乃至长期可塑性，即稳定性—可塑性两难；性能损失集中发生在任务切换前后，仅在任务末评测无法观测。
+      </p>
+    </div>
+
+    <div class="grid grid-3 kfacts">
+      <div class="card fact" data-reveal>
+        <span class="t-tag">现象</span>
+        <b class="card-title">灾难性遗忘</b>
+        <p>在新任务上继续训练会显著降低既有任务的性能：对既有任务重要的参数被新任务的更新覆写。<i class="cite">（McCloskey &amp; Cohen, 1989; Kirkpatrick et al., PNAS 2017）</i></p>
+        <span class="fact-demo" role="img" aria-label="同一张测试样本：学习任务一后判对，学习任务二后被误判">
+          <span class="fd-shot">
+            <img src="./assets/img/samples/cat.jpg" alt="" width="86" height="62" loading="lazy">
+            <i class="fd-tag is-ok">✓ 96%</i>
+            <em>学习任务 t1 后</em>
+          </span>
+          <svg class="ic fd-arrow" width="15" height="15" aria-hidden="true"><use href="#i-arrow"/></svg>
+          <span class="fd-shot is-off">
+            <img src="./assets/img/samples/cat.jpg" alt="" width="86" height="62" loading="lazy">
+            <i class="fd-tag is-bad">✗ 31%</i>
+            <em>学习任务 t2 后</em>
+          </span>
+        </span>
+      </div>
+
+      <div class="card fact" data-reveal>
+        <span class="t-tag">权衡</span>
+        <b class="card-title">稳定性—可塑性两难</b>
+        <p>网络须足够可塑以学习新任务，又须足够稳定以保留既有知识；约束过强会抑制学习，长期甚至导致可塑性丧失。既有方法均在两端之间选取工作点。<i class="cite">（Grossberg, 1980; Dohare et al., Nature 2024）</i></p>
+        <span class="fact-gauge" role="img" aria-label="从完全可塑到完全稳定的谱系：两端分别导致遗忘与僵化，中间是工作区">
+          <i class="fg-end is-bad">遗忘</i>
+          <span class="fg-track"><b aria-hidden="true"></b></span>
+          <i class="fg-end is-warn">僵化</i>
+        </span>
+        <span class="fact-foot"><em>完全可塑</em><em>工作区</em><em>完全稳定</em></span>
+      </div>
+
+      <div class="card fact" data-reveal>
+        <span class="t-tag">现象</span>
+        <b class="card-title">Stability gap</b>
+        <p>任务切换后，既有任务性能先骤降、再部分恢复；仅在任务末评测会高估稳健性，该暂态只有逐状态评测可以观测。<i class="cite">（De Lange et al., ICLR 2023）</i></p>
+        <span class="fact-cmp">
+          <span><em>只在任务末评测</em><b class="is-ok">94%</b></span>
+          <span><em>切换瞬间 · 仅逐状态可见</em><b class="is-bad">62%</b></span>
+        </span>
+      </div>
+    </div>
+
+    <p class="prose" style="margin-top:var(--s-6)">
+      前两者界定方法设计的取舍空间——既有方法均在稳定性与可塑性之间选取工作点；第三者对评测协议提出要求：性能须在每个训练阶段之后度量，而非仅在序列末尾。下一节的指标即建立在这一要求之上。
+    </p>
+    <div class="link-row">
+      <a class="arrow-link" href="./learn">
+        完整背景介绍<svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-arrow"/></svg>
+      </a>
+      <a class="arrow-link" href="./works">
+        相关工作<svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-arrow"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 四 · 榜单与评测 ===================== -->
+<section class="section section--tint" id="evaluation">
+  <div class="shell">
+    <div class="sec-head">
+      <p class="eyebrow eyebrow--mark">
+        <svg class="e-mark" viewBox="1 0.4 18 17.2" aria-hidden="true">
+          <rect class="m-deep"  x="1"    y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-deep"  x="7.7"  y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-deep"  x="14.4" y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-mid"   x="1"    y="6.7" width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-mid"   x="7.7"  y="6.7" width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-ghost" x="1"    y=".4"  width="4.6" height="4.6" rx="1.1"/>
+        </svg>
+        04 · 榜单与评测
+      </p>
+      <h2>统一口径的方法榜单</h2>
+      <p>
+        不同方法的数值可比，要求训练预算、回放缓存规模与任务顺序等条件一致；这些条件构成协议有效性检查，也是榜单的收录门槛。榜单按类别增量、域增量与持续指令微调分别成表；下为各表口径的要点，任务序列与对齐条件的完整口径见<a href="./leaderboard">榜单</a>。
+      </p>
+    </div>
+
+    <div class="board-card" data-reveal id="board-preview">
+      <div class="board-head">
+        <div class="filter-bar" role="group" aria-label="切换问题设定">
+          <button type="button" class="chip" data-board="cil" aria-pressed="true">类别增量</button>
+          <button type="button" class="chip" data-board="clip" aria-pressed="false">域增量</button>
+          <button type="button" class="chip" data-board="tune" aria-pressed="false">持续指令微调</button>
+        </div>
+        <span class="badge" data-board-badge>结果待发布</span>
+      </div>
+
+      <div class="board-pane" data-pane="cil">
+        <dl class="board-spec">
+          <div><dt>问题设定</dt><dd>每阶段到来新的类别；推理时不给任务身份，须在已见的全部类别中判别。</dd></div>
+          <div><dt>骨干</dt><dd class="mono">ResNet 系</dd></div>
+          <div><dt>报告指标</dt><dd class="mono">ACC · AIA · 遗忘度</dd></div>
+        </dl>
+      </div>
+
+      <div class="board-pane" data-pane="clip" hidden>
+        <dl class="board-spec">
+          <div><dt>问题设定</dt><dd>标签空间不变，各阶段的数据来自不同领域；预训练获得的零样本迁移能力本身也是须保持的对象。</dd></div>
+          <div><dt>骨干</dt><dd class="mono">CLIP ViT-B/16</dd></div>
+          <div><dt>报告指标</dt><dd class="mono">ACC · AIA · BWT · 零样本保持</dd></div>
+        </dl>
+      </div>
+
+      <div class="board-pane" data-pane="tune" hidden>
+        <dl class="board-spec">
+          <div><dt>问题设定</dt><dd>每阶段到来一个新的指令任务；既有指令能力与基座的通用能力都须保持。</dd></div>
+          <div><dt>骨干</dt><dd class="mono">LLaVA / Qwen-VL / InternVL 系多模态大模型</dd></div>
+          <div><dt>报告指标</dt><dd class="mono">ACC · AIA · BWT · 遗忘度 · 通用能力保持</dd></div>
+        </dl>
+      </div>
+
+      <div class="board-foot">
+        <span data-board-note>尚无收录结果：实测数值通过协议核查后在榜单发布</span>
+        <a class="arrow-link" href="./leaderboard">
+          完整榜单<svg class="ic" width="15" height="15" aria-hidden="true"><use href="#i-arrow"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="link-row" style="margin-top:var(--s-5)">
+      <a class="arrow-link" href="./evaluation#checks">
+        协议有效性检查<svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-arrow"/></svg>
+      </a>
+      <a class="arrow-link" href="./leaderboard#submit">
+        提交规范<svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-arrow"/></svg>
+      </a>
+    </div>
+
+    <h3 class="sub-head">评价指标</h3>
+    <p class="sub-lede">
+      榜单的指标列按语义维度分组如下；记号、形式定义与矩阵读法见<a href="./evaluation">评测协议</a>。
+    </p>
+
+    <div class="metric-map">
+      <div class="m-set">
+        <p class="m-dim">终点性能</p>
+        <p class="m-eq"><b>ACC</b><span class="m-name">最终平均准确率</span>
+          <span class="m-tail">序列结束后在全部已见任务上的平均</span></p>
+      </div>
+      <div class="m-set">
+        <p class="m-dim">学习过程</p>
+        <p class="m-eq"><b>AIA</b><span class="m-name">平均增量准确率</span>
+          <span class="m-tail">各训练阶段平均准确率的再平均</span></p>
+      </div>
+      <div class="m-set">
+        <p class="m-dim">对既有任务的影响</p>
+        <p class="m-eq"><b>BWT</b><span class="m-name">后向迁移</span>
+          <span class="m-tail">相对刚学会时的净变化，负值即净遗忘</span></p>
+        <p class="m-eq"><b>F</b><span class="m-name">遗忘度</span>
+          <span class="m-tail">相对历史最优的下降量，恒非负</span></p>
+      </div>
+      <div class="m-set">
+        <p class="m-dim">通用能力</p>
+        <p class="m-eq"><b>Gen</b><span class="m-name">通用能力保持</span>
+          <span class="m-tail">未参与训练的通用基准上相对基座的保持</span></p>
+      </div>
+    </div>
+
+    <div class="link-row" style="margin-top:var(--s-5)">
+      <a class="arrow-link" href="./evaluation">
+        指标的形式定义与矩阵读法<svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-arrow"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== 五 · 我们的项目 ====================== -->
+<section class="section" id="projects">
+  <div class="shell">
+    <div class="sec-head">
+      <p class="eyebrow eyebrow--mark">
+        <svg class="e-mark" viewBox="1 0.4 18 17.2" aria-hidden="true">
+          <rect class="m-deep" x="1"    y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-deep" x="7.7"  y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-deep" x="14.4" y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-mid"  x="1"    y="6.7" width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-mid"  x="7.7"  y="6.7" width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-lite" x="1"    y=".4"  width="4.6" height="4.6" rx="1.1"/>
+        </svg>
+        05 · 我们的项目
+      </p>
+      <h2>开源研究项目</h2>
+      <p>
+        CLightning 是持续学习方法库套件，各子库分别面向类别增量、视觉语言模型的域增量微调与多模态大模型的持续指令微调；CLAgent 以持续学习为核心能力，研究经验积累、技能沉淀与自我改进的智能体系统；CLOCR 面向文字识别，研究版式、语种与年代分布漂移下的识别能力保持。
+      </p>
+    </div>
+
+    <article class="suite glow-card" id="proj-suite" data-reveal>
+      <div class="suite-rail" role="tablist" aria-label="研究项目" aria-orientation="vertical">
+        <button class="suite-tab" role="tab" data-proj="clight" aria-selected="true" aria-controls="suite-pane-clight">
+          <span class="suite-no" aria-hidden="true">01</span>
+          <span class="suite-name"><b>CLightning</b><span>持续学习方法库套件 · Lightning + HF / PEFT</span></span>
+        </button>
+        <button class="suite-tab" role="tab" data-proj="agent" aria-selected="false" aria-controls="suite-pane-agent">
+          <span class="suite-no" aria-hidden="true">02</span>
+          <span class="suite-name"><b>CLAgent</b><span>以持续学习为核心能力的自进化智能体</span></span>
+        </button>
+        <button class="suite-tab" role="tab" data-proj="ocr" aria-selected="false" aria-controls="suite-pane-ocr">
+          <span class="suite-no" aria-hidden="true">03</span>
+          <span class="suite-name"><b>CLOCR</b><span>面向文字识别的持续学习</span></span>
+        </button>
+        <p class="suite-note">三者采用同一套实验约定：<b>YAML 配置化定义</b> · <b>统一学习器基类</b> · <b>逐阶段状态导出</b> · <b>EvalKit 共享指标</b></p>
+      </div>
+
+      <div class="suite-main">
+        <div class="code code--suite">
+          <div class="code-bar">
+            <div class="code-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+            <span class="code-name" data-suite-name>clightning · 安装与使用</span>
+            <button type="button" class="code-copy" aria-label="复制当前命令">
+              <svg class="ic ic-copy" width="14" height="14" aria-hidden="true"><use href="#i-copy"/></svg>
+              <svg class="ic ic-check" width="14" height="14" aria-hidden="true"><use href="#i-check"/></svg>
+            </button>
+          </div>
+
+          <div class="code-pane" data-pane="clight" id="suite-pane-clight" role="tabpanel"><pre><span class="tk-c"># 安装:conda 一步建环境(torch 2.8.0 · transformers · peft)</span>
+<span class="tk-c">$</span> <span class="tk-fn">conda</span> env create -f environment.yaml
+<span class="tk-c">$</span> <span class="tk-fn">conda</span> activate torch-2.8.0
+
+<span class="tk-c"># 使用:单份 YAML 定义一次持续学习实验</span>
+<span class="tk-c">$</span> <span class="tk-fn">python</span> train.py config/demo.yaml
+<span class="tk-c">$</span> <span class="tk-fn">python</span> eval.py config/demo.yaml --config config/eval/coin.yaml
+
+<span class="tk-out">outputs/demo/cl_summary.csv</span>   <span class="tk-c"># ACC / AIA / BWT / 遗忘度</span></pre></div>
+
+          <div class="code-pane" data-pane="agent" id="suite-pane-agent" role="tabpanel" hidden><pre><span class="tk-c"># CLightning 整套封装为智能体可调用的技能(skill)</span>
+<span class="tk-c">$</span> <span class="tk-fn">clagent</span> skill add <span class="tk-str">clightning</span>
+<span class="tk-c">$</span> <span class="tk-fn">clagent</span> run <span class="tk-str">"在同一条指令任务序列上对比 olora 与 moelora"</span>
+
+<span class="tk-out">  规划实验 → 调用技能训练与评测 → 汇总 CL 矩阵</span>
+<span class="tk-out">  经验沉淀为新技能,积累而不覆写既有能力</span></pre></div>
+
+          <div class="code-pane" data-pane="ocr" id="suite-pane-ocr" role="tabpanel" hidden><pre><span class="tk-c"># 研究对象:版式、语种与年代分布漂移下的识别能力保持</span>
+<span class="tk-c"># 数据序列与识别器在同一份 YAML 里声明</span>
+<span class="tk-c">$</span> <span class="tk-fn">python</span> train.py config/ocr.yaml
+<span class="tk-c">$</span> <span class="tk-fn">python</span> eval.py config/ocr.yaml --config config/eval/ocr.yaml
+
+<span class="tk-out">outputs/ocr/cl_summary.csv</span>   <span class="tk-c"># CER / WER + CL 矩阵</span></pre></div>
+        </div>
+
+        <div class="suite-links">
+          <p class="suite-linkrow" data-links="clight">
+            <a class="suite-link suite-link--main" href="./libraries">CLightning 项目页<svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            <span class="suite-hint">子库覆盖类别增量、域增量与持续指令微调</span>
+          </p>
+          <p class="suite-linkrow" data-links="agent" hidden>
+            <a class="suite-link suite-link--main" href="./agent">CLAgent 项目页<svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            <span class="suite-hint">技能与经验沿任务流积累，复用中继续修正</span>
+          </p>
+          <p class="suite-linkrow" data-links="ocr" hidden>
+            <a class="suite-link suite-link--main" href="./ocr">CLOCR 项目页<svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            <span class="suite-hint">版式、语种与年代序列上的识别能力保持</span>
+          </p>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="shell">
+    <div class="foot-top">
+      <div class="foot-about">
+        <span class="brand-mark sm" aria-hidden="true">
+          <svg viewBox="0 0 20 20" width="18" height="18">
+            <rect x="1"    y="13"  width="4.6" height="4.6" rx="1.1"/>
+            <rect x="7.7"  y="13"  width="4.6" height="4.6" rx="1.1"/>
+            <rect x="14.4" y="13"  width="4.6" height="4.6" rx="1.1"/>
+            <rect x="1"    y="6.7" width="4.6" height="4.6" rx="1.1" opacity=".6"/>
+            <rect x="7.7"  y="6.7" width="4.6" height="4.6" rx="1.1" opacity=".6"/>
+            <rect x="1"    y=".4"  width="4.6" height="4.6" rx="1.1" opacity=".28"/>
+          </svg>
+        </span>
+        <p class="foot-name">
+          <svg class="wordmark" viewBox="45 -756 11439 964" aria-hidden="true" focusable="false">
+            <path class="wm-main" d="M332 14Q204 14 129 -58Q53 -131 53 -267V-433Q53 -569 129 -642Q204 -714 332 -714Q460 -714 529 -644Q598 -574 598 -452V-446H484V-456Q484 -524 447 -567Q410 -611 332 -611Q256 -611 212 -564Q169 -517 169 -435V-265Q169 -184 212 -137Q256 -89 332 -89Q410 -89 447 -133Q484 -177 484 -244V-262H598V-248Q598 -126 529 -56Q460 14 332 14Z M946 14Q872 14 814 -16Q756 -47 723 -104Q689 -160 689 -239V-254Q689 -333 723 -390Q756 -447 814 -477Q872 -508 946 -508Q1020 -508 1078 -477Q1136 -447 1169 -390Q1203 -333 1203 -254V-239Q1203 -160 1169 -104Q1136 -47 1078 -16Q1020 14 946 14ZM946 -84Q1011 -84 1052 -125Q1093 -167 1093 -242V-252Q1093 -326 1052 -368Q1012 -410 946 -410Q881 -410 840 -368Q799 -326 799 -252V-242Q799 -167 840 -125Q881 -84 946 -84Z M1323 0V-494H1431V-422H1448Q1461 -452 1496 -477Q1531 -502 1601 -502Q1658 -502 1701 -477Q1745 -451 1769 -405Q1794 -359 1794 -296V0H1684V-287Q1684 -349 1654 -379Q1623 -409 1568 -409Q1506 -409 1470 -368Q1433 -326 1433 -250V0Z M2107 0Q2060 0 2033 -28Q2005 -56 2005 -103V-402H1873V-494H2005V-654H2115V-494H2259V-402H2115V-122Q2115 -92 2143 -92H2244V0Z M2373 0V-494H2483V0Z M2628 0V-494H2736V-422H2753Q2766 -452 2801 -477Q2836 -502 2906 -502Q2963 -502 3006 -477Q3050 -451 3074 -405Q3099 -359 3099 -296V0H2989V-287Q2989 -349 2959 -379Q2928 -409 2873 -409Q2811 -409 2775 -368Q2738 -326 2738 -250V0Z M3420 8Q3363 8 3320 -17Q3276 -42 3251 -89Q3227 -135 3227 -198V-494H3337V-206Q3337 -144 3367 -115Q3398 -85 3453 -85Q3515 -85 3551 -126Q3588 -167 3588 -244V-494H3697V0H3590V-71H3573Q3560 -43 3525 -17Q3490 8 3420 8Z M3995 14Q3943 14 3901 -4Q3859 -23 3835 -58Q3810 -93 3810 -143Q3810 -194 3835 -227Q3859 -261 3902 -278Q3945 -296 3999 -296H4146V-326Q4146 -367 4121 -392Q4096 -417 4043 -417Q3992 -417 3966 -393Q3939 -369 3931 -331L3829 -364Q3841 -404 3867 -436Q3894 -468 3938 -488Q3982 -508 4045 -508Q4142 -508 4197 -459Q4252 -410 4252 -319V-121Q4252 -91 4280 -91H4322V0H4243Q4207 0 4185 -18Q4162 -36 4162 -67V-69H4146Q4139 -55 4124 -35Q4108 -15 4077 -1Q4047 14 3995 14ZM4013 -76Q4072 -76 4109 -110Q4146 -144 4146 -201V-212H4006Q3967 -212 3944 -195Q3920 -178 3920 -146Q3920 -114 3945 -95Q3969 -76 4013 -76Z M4415 0V-700H4525V0Z M4820 0V-700H4935V-105H5267V0Z M5587 14Q5513 14 5456 -18Q5400 -49 5369 -106Q5337 -164 5337 -241V-253Q5337 -330 5368 -387Q5399 -445 5455 -476Q5511 -508 5584 -508Q5655 -508 5709 -476Q5763 -445 5793 -388Q5823 -331 5823 -256V-216H5449Q5451 -155 5491 -119Q5531 -82 5590 -82Q5647 -82 5675 -107Q5703 -132 5717 -164L5808 -118Q5794 -90 5768 -59Q5741 -29 5698 -7Q5654 14 5587 14ZM5450 -299H5711Q5707 -351 5673 -381Q5638 -411 5583 -411Q5527 -411 5492 -381Q5458 -351 5450 -299Z M6092 14Q6040 14 5998 -4Q5956 -23 5932 -58Q5907 -93 5907 -143Q5907 -194 5932 -227Q5956 -261 5999 -278Q6042 -296 6096 -296H6243V-326Q6243 -367 6218 -392Q6193 -417 6140 -417Q6089 -417 6063 -393Q6036 -369 6028 -331L5926 -364Q5938 -404 5964 -436Q5991 -468 6035 -488Q6079 -508 6142 -508Q6239 -508 6294 -459Q6349 -410 6349 -319V-121Q6349 -91 6377 -91H6419V0H6340Q6304 0 6282 -18Q6259 -36 6259 -67V-69H6243Q6236 -55 6221 -35Q6205 -15 6174 -1Q6144 14 6092 14ZM6110 -76Q6169 -76 6206 -110Q6243 -144 6243 -201V-212H6103Q6064 -212 6041 -195Q6017 -178 6017 -146Q6017 -114 6042 -95Q6066 -76 6110 -76Z M6512 0V-494H6620V-436H6637Q6649 -467 6674 -481Q6700 -496 6738 -496H6797V-397H6735Q6685 -397 6654 -370Q6622 -344 6622 -287V0Z M6897 0V-494H7005V-422H7022Q7035 -452 7070 -477Q7105 -502 7175 -502Q7232 -502 7275 -477Q7319 -451 7343 -405Q7368 -359 7368 -296V0H7258V-287Q7258 -349 7228 -379Q7197 -409 7142 -409Q7080 -409 7044 -368Q7007 -326 7007 -250V0Z M7508 0V-494H7618V0Z M7763 0V-494H7871V-422H7888Q7901 -452 7936 -477Q7971 -502 8041 -502Q8098 -502 8141 -477Q8185 -451 8209 -405Q8234 -359 8234 -296V0H8124V-287Q8124 -349 8094 -379Q8063 -409 8008 -409Q7946 -409 7910 -368Q7873 -326 7873 -250V0Z M8350 -245V-260Q8350 -338 8382 -393Q8413 -448 8465 -478Q8516 -508 8578 -508Q8649 -508 8687 -482Q8724 -456 8741 -426H8758V-494H8865V97Q8865 144 8838 172Q8810 200 8763 200H8431V104H8727Q8756 104 8756 74V-75H8739Q8728 -57 8709 -39Q8690 -21 8658 -9Q8626 3 8578 3Q8516 3 8464 -27Q8412 -56 8381 -112Q8350 -167 8350 -245ZM8609 -93Q8673 -93 8715 -134Q8757 -175 8757 -248V-257Q8757 -331 8716 -371Q8674 -411 8609 -411Q8545 -411 8503 -371Q8461 -331 8461 -257V-248Q8461 -175 8503 -134Q8545 -93 8609 -93Z"/>
+            <path class="wm-dot" d="M2389 -748h78a42 42 0 0 1 42 42v78a42 42 0 0 1 -42 42h-78a42 42 0 0 1 -42 -42v-78a42 42 0 0 1 42 -42z M7524 -748h78a42 42 0 0 1 42 42v78a42 42 0 0 1 -42 42h-78a42 42 0 0 1 -42 -42v-78a42 42 0 0 1 42 -42z"/>
+            <path class="wm-for" d="M9271 0V-420H9121V-489H9271V-614Q9271 -654 9294 -677Q9316 -700 9358 -700H9481V-632H9380Q9350 -632 9350 -602V-489H9504V-420H9350V0Z M9821 14Q9747 14 9690 -17Q9634 -48 9602 -105Q9571 -161 9571 -238V-251Q9571 -327 9602 -384Q9634 -441 9690 -472Q9747 -503 9821 -503Q9895 -503 9951 -472Q10008 -441 10039 -384Q10071 -327 10071 -251V-238Q10071 -161 10039 -105Q10008 -48 9951 -17Q9895 14 9821 14ZM9821 -57Q9899 -57 9945 -106Q9992 -156 9992 -240V-249Q9992 -333 9945 -383Q9899 -432 9821 -432Q9744 -432 9697 -383Q9650 -333 9650 -249V-240Q9650 -156 9697 -106Q9744 -57 9821 -57Z M10215 0V-489H10292V-429H10306Q10319 -461 10346 -476Q10373 -491 10417 -491H10475V-419H10412Q10359 -419 10326 -389Q10294 -360 10294 -298V0Z"/>
+            <path class="wm-ai" d="M10682 0 10874 -700H11083L11275 0H11151L11109 -160H10848L10806 0ZM10876 -270H11081L10987 -625H10970Z M11356 0V-700H11477V0Z"/>
+          </svg>
+          <span class="sr-only">Continual Learning for AI</span>
+        </p>
+        <p class="foot-desc">
+          持续学习的背景介绍、相关工作与榜单，以及 CLightning、CLAgent 与 CLOCR 研究项目。全部结果建立在统一的 CL 矩阵评测口径上，站点内容随研究进展修订。
+        </p>
+      </div>
+
+      <div class="foot-cols">
+        <div>
+          <h2>背景介绍</h2>
+          <a href="./learn">持续学习入门</a>
+          <a href="./learn#settings">问题设定</a>
+          <a href="./learn#families">方法谱系</a>
+        </div>
+        <div>
+          <h2>相关工作与榜单</h2>
+          <a href="./works">相关工作</a>
+          <a href="./leaderboard">榜单</a>
+          <a href="./evaluation">评测协议</a>
+        </div>
+        <div>
+          <h2>我们的项目</h2>
+          <a href="./libraries">CLightning</a>
+          <a href="./agent">CLAgent</a>
+          <a href="./ocr">CLOCR</a>
+        </div>
+        <div>
+          <h2>关于</h2>
+          <a href="./team">团队</a>
+          <a href="./libraries#cite">引用</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot-bottom">
+      <span>© 2026 Continual Learning for AI · 文本内容以 CC BY-NC-SA 4.0 发布</span>
+      <span>勘误与补充：欢迎通过 Issue / PR 提交</span>
+    </div>
+  </div>
+</footer>
+<div class="palette" id="palette" hidden>
+  <div class="palette-scrim" data-palette-close></div>
+  <div class="palette-panel" role="dialog" aria-modal="true" aria-label="全站检索">
+    <div class="palette-input">
+      <svg class="ic" width="17" height="17" aria-hidden="true"><use href="#i-search"/></svg>
+      <input id="palette-input" type="search" placeholder="搜索页面、方法或论文…" autocomplete="off" spellcheck="false"
+             role="combobox" aria-expanded="true" aria-controls="palette-list" aria-autocomplete="list">
+      <button type="button" class="palette-esc" data-palette-close>esc</button>
+    </div>
+    <ul class="palette-list" id="palette-list" role="listbox" aria-label="检索结果"></ul>
+    <div class="palette-foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
+      <span><kbd>↵</kbd> 打开</span>
+      <span><kbd>esc</kbd> 关闭</span>
+    </div>
+  </div>
+</div>
+
+<script src="./assets/site.js?v=a037c3d1" defer></script>
+    <script src="./assets/home.js?v=02afaa1f" defer></script>
+    <script src="./assets/settings.js?v=5887a471" defer></script>
+</body>
+</html>

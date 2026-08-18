@@ -1,0 +1,712 @@
+{
+  "cats": {
+    "reg": "正则化",
+    "replay": "回放",
+    "arch": "结构扩展",
+    "ne": "非样本",
+    "prompt": "提示 / PEFT",
+    "vlm": "CLIP / VLM",
+    "llm": "LLM / MLLM",
+    "agent": "智能体",
+    "ours": "自研",
+    "origin": "奠基与现象",
+    "survey": "综述",
+    "bench": "基准",
+    "tool": "工具"
+  },
+  "families": [
+    "reg",
+    "replay",
+    "arch",
+    "ne",
+    "prompt",
+    "vlm",
+    "llm",
+    "agent",
+    "ours"
+  ],
+  "kinds": [
+    "origin",
+    "survey",
+    "bench",
+    "tool"
+  ],
+  "items": [
+    {
+      "name": "LwF",
+      "cat": "reg",
+      "year": 2016,
+      "venue": "ECCV 2016",
+      "note": "以旧模型对新数据的输出为软目标蒸馏，无需保留旧样本。",
+      "libs": [
+        "CIL",
+        "CLIP",
+        "MLLM"
+      ]
+    },
+    {
+      "name": "EWC",
+      "cat": "reg",
+      "year": 2017,
+      "venue": "PNAS 2017",
+      "note": "Fisher 信息估计参数重要性，对重要方向施加二次惩罚。",
+      "libs": [
+        "CIL",
+        "CLIP",
+        "MLLM"
+      ]
+    },
+    {
+      "name": "SI",
+      "cat": "reg",
+      "year": 2017,
+      "venue": "ICML 2017",
+      "note": "沿训练轨迹在线累积参数对损失下降的贡献作为重要性。",
+      "libs": []
+    },
+    {
+      "name": "MAS",
+      "cat": "reg",
+      "year": 2018,
+      "venue": "ECCV 2018",
+      "note": "以输出对参数的敏感度做无监督重要性估计。",
+      "libs": []
+    },
+    {
+      "name": "RWalk",
+      "cat": "reg",
+      "year": 2018,
+      "venue": "ECCV 2018",
+      "note": "黎曼视角融合 Fisher 与轨迹重要性，并提出遗忘度指标。",
+      "libs": []
+    },
+    {
+      "name": "Deep Generative Replay",
+      "cat": "replay",
+      "year": 2017,
+      "venue": "NeurIPS 2017",
+      "note": "生成模型合成旧数据回放，以生成器替代样本存储。",
+      "libs": []
+    },
+    {
+      "name": "GEM",
+      "cat": "replay",
+      "year": 2017,
+      "venue": "NeurIPS 2017",
+      "note": "新任务梯度投影至不增加旧任务损失的半空间；提出 BWT / FWT 指标。",
+      "libs": []
+    },
+    {
+      "name": "iCaRL",
+      "cat": "replay",
+      "year": 2017,
+      "venue": "CVPR 2017",
+      "note": "羊群式样本选择与最近均值分类器，类增量回放奠基。",
+      "libs": [
+        "CIL"
+      ]
+    },
+    {
+      "name": "A-GEM",
+      "cat": "replay",
+      "year": 2019,
+      "venue": "ICLR 2019",
+      "note": "GEM 的均值约束近似，单次投影大幅降低开销。",
+      "libs": []
+    },
+    {
+      "name": "BiC",
+      "cat": "replay",
+      "year": 2019,
+      "venue": "CVPR 2019",
+      "note": "两阶段偏置校正层修正新旧类 logits 失衡。",
+      "libs": []
+    },
+    {
+      "name": "ER (Tiny Episodic Memories)",
+      "cat": "replay",
+      "year": 2019,
+      "venue": "arXiv 2019",
+      "note": "小缓存与新数据混合训练，最朴素也最稳健的回放基线。",
+      "libs": []
+    },
+    {
+      "name": "GSS",
+      "cat": "replay",
+      "year": 2019,
+      "venue": "NeurIPS 2019",
+      "note": "以梯度多样性为准则选择缓存样本。",
+      "libs": []
+    },
+    {
+      "name": "MIR",
+      "cat": "replay",
+      "year": 2019,
+      "venue": "NeurIPS 2019",
+      "note": "优先回放将被当前参数更新最大干扰的样本。",
+      "libs": []
+    },
+    {
+      "name": "UCIR",
+      "cat": "replay",
+      "year": 2019,
+      "venue": "CVPR 2019",
+      "note": "余弦归一化分类器与特征蒸馏抑制类间偏置。",
+      "libs": [
+        "CIL"
+      ]
+    },
+    {
+      "name": "DER++",
+      "cat": "replay",
+      "year": 2020,
+      "venue": "NeurIPS 2020",
+      "note": "回放旧样本 logits（暗知识）而非仅标签。",
+      "libs": []
+    },
+    {
+      "name": "PODNet",
+      "cat": "replay",
+      "year": 2020,
+      "venue": "ECCV 2020",
+      "note": "空间池化蒸馏约束中间表征漂移。",
+      "libs": [
+        "CIL"
+      ]
+    },
+    {
+      "name": "WA",
+      "cat": "replay",
+      "year": 2020,
+      "venue": "CVPR 2020",
+      "note": "权重对齐校正新旧类分类器权重范数失衡。",
+      "libs": [
+        "CIL"
+      ]
+    },
+    {
+      "name": "Progressive Networks",
+      "cat": "arch",
+      "year": 2016,
+      "venue": "arXiv 2016",
+      "note": "每任务扩展一列子网络，横向连接迁移既有特征。",
+      "libs": []
+    },
+    {
+      "name": "DEN",
+      "cat": "arch",
+      "year": 2018,
+      "venue": "ICLR 2018",
+      "note": "按需动态扩展容量并选择性重训相关神经元。",
+      "libs": []
+    },
+    {
+      "name": "HAT",
+      "cat": "arch",
+      "year": 2018,
+      "venue": "ICML 2018",
+      "note": "可学习硬注意力掩码在训练中决定受保护参数。",
+      "libs": []
+    },
+    {
+      "name": "PackNet",
+      "cat": "arch",
+      "year": 2018,
+      "venue": "CVPR 2018",
+      "note": "迭代剪枝释放容量，二值掩码隔离任务子网络。",
+      "libs": []
+    },
+    {
+      "name": "Piggyback",
+      "cat": "arch",
+      "year": 2018,
+      "venue": "ECCV 2018",
+      "note": "冻结骨干，仅为每任务学习二值权重掩码。",
+      "libs": []
+    },
+    {
+      "name": "DER (CIL)",
+      "cat": "arch",
+      "year": 2021,
+      "venue": "CVPR 2021",
+      "note": "动态可扩展表征：每阶段扩展特征分支并聚合。",
+      "libs": [
+        "CIL"
+      ]
+    },
+    {
+      "name": "FOSTER",
+      "cat": "arch",
+      "year": 2022,
+      "venue": "ECCV 2022",
+      "note": "先扩展后蒸馏压缩，两阶段控制参数增长。",
+      "libs": []
+    },
+    {
+      "name": "MEMO",
+      "cat": "arch",
+      "year": 2023,
+      "venue": "ICLR 2023",
+      "note": "按层解耦共享与特化，以内存预算公平比较扩展策略。",
+      "libs": []
+    },
+    {
+      "name": "IL2A",
+      "cat": "ne",
+      "year": 2021,
+      "venue": "NeurIPS 2021",
+      "note": "语义与实例双重增广替代旧样本存储。",
+      "libs": [
+        "CIL"
+      ]
+    },
+    {
+      "name": "PASS",
+      "cat": "ne",
+      "year": 2021,
+      "venue": "CVPR 2021",
+      "note": "原型增广与自监督辅助任务，免样本保持决策边界。",
+      "libs": []
+    },
+    {
+      "name": "SSRE",
+      "cat": "ne",
+      "year": 2022,
+      "venue": "CVPR 2022",
+      "note": "结构重组与原型补偿的非样本类增量方法。",
+      "libs": [
+        "CIL"
+      ]
+    },
+    {
+      "name": "FeTrIL",
+      "cat": "ne",
+      "year": 2023,
+      "venue": "WACV 2023",
+      "note": "冻结特征提取器，以伪特征平移生成旧类特征。",
+      "libs": []
+    },
+    {
+      "name": "DualPrompt",
+      "cat": "prompt",
+      "year": 2022,
+      "venue": "ECCV 2022",
+      "note": "通用与专家提示解耦，注入不同深度的层。",
+      "libs": []
+    },
+    {
+      "name": "L2P",
+      "cat": "prompt",
+      "year": 2022,
+      "venue": "CVPR 2022",
+      "note": "冻结骨干，按输入从提示池检索可学习提示。",
+      "libs": []
+    },
+    {
+      "name": "S-Prompts",
+      "cat": "prompt",
+      "year": 2022,
+      "venue": "NeurIPS 2022",
+      "note": "域增量下按域独立学习提示，推理时检索所属域。",
+      "libs": []
+    },
+    {
+      "name": "CODA-Prompt",
+      "cat": "prompt",
+      "year": 2023,
+      "venue": "CVPR 2023",
+      "note": "以注意力权重端到端组装提示，免离散检索。",
+      "libs": []
+    },
+    {
+      "name": "HiDe-Prompt",
+      "cat": "prompt",
+      "year": 2023,
+      "venue": "NeurIPS 2023",
+      "note": "层级分解任务内与任务间统计量的提示协同。",
+      "libs": []
+    },
+    {
+      "name": "LAE",
+      "cat": "prompt",
+      "year": 2023,
+      "venue": "ICCV 2023",
+      "note": "统一 PEFT 持续学习框架：在线/离线专家插值。",
+      "libs": []
+    },
+    {
+      "name": "O-LoRA",
+      "cat": "prompt",
+      "year": 2023,
+      "venue": "EMNLP Findings 2023",
+      "note": "各任务 LoRA 子空间相互正交，机制上抑制干扰。",
+      "libs": [
+        "MLLM"
+      ]
+    },
+    {
+      "name": "Progressive Prompts",
+      "cat": "prompt",
+      "year": 2023,
+      "venue": "ICLR 2023",
+      "note": "逐任务级联提示并冻结既有提示，近零遗忘。",
+      "libs": []
+    },
+    {
+      "name": "RanPAC",
+      "cat": "prompt",
+      "year": 2023,
+      "venue": "NeurIPS 2023",
+      "note": "随机投影与类原型，免训练的强基线。",
+      "libs": []
+    },
+    {
+      "name": "SLCA",
+      "cat": "prompt",
+      "year": 2023,
+      "venue": "ICCV 2023",
+      "note": "骨干慢学习率与分类器对齐，微调视角的强基线。",
+      "libs": []
+    },
+    {
+      "name": "EASE",
+      "cat": "prompt",
+      "year": 2024,
+      "venue": "CVPR 2024",
+      "note": "每任务扩展轻量适配器子空间，语义引导原型补全。",
+      "libs": []
+    },
+    {
+      "name": "InfLoRA",
+      "cat": "prompt",
+      "year": 2024,
+      "venue": "CVPR 2024",
+      "note": "无干扰子空间内初始化并约束低秩更新。",
+      "libs": []
+    },
+    {
+      "name": "Continual-CLIP",
+      "cat": "vlm",
+      "year": 2022,
+      "venue": "arXiv 2022",
+      "note": "冻结 CLIP 的零样本能力即为强持续学习基线的实证。",
+      "libs": []
+    },
+    {
+      "name": "ZSCL",
+      "cat": "vlm",
+      "year": 2023,
+      "venue": "ICCV 2023",
+      "note": "参照数据蒸馏防止零样本迁移能力退化；提出 MTIL 协议。",
+      "libs": [
+        "CLIP"
+      ]
+    },
+    {
+      "name": "MoE-Adapters",
+      "cat": "vlm",
+      "year": 2024,
+      "venue": "CVPR 2024",
+      "note": "MoE 适配器与分布判别自动路由的 VLM 持续学习。",
+      "libs": []
+    },
+    {
+      "name": "CCLIP",
+      "cat": "vlm",
+      "year": 0,
+      "venue": "框架实现",
+      "note": "持续 CLIP 微调，权重合并系数控制新旧模型插值。",
+      "libs": [
+        "CLIP"
+      ]
+    },
+    {
+      "name": "GRPO (DeepSeekMath)",
+      "cat": "llm",
+      "year": 2024,
+      "venue": "arXiv 2024",
+      "note": "组内相对优势替代价值网络的策略优化。",
+      "libs": [
+        "MLLM"
+      ]
+    },
+    {
+      "name": "MoELoRA (CoIN)",
+      "cat": "llm",
+      "year": 2024,
+      "venue": "arXiv 2024",
+      "note": "多低秩专家与门控路由，CoIN 基准的参考方法。",
+      "libs": [
+        "MLLM"
+      ]
+    },
+    {
+      "name": "Model Tailor",
+      "cat": "llm",
+      "year": 2024,
+      "venue": "ICML 2024",
+      "note": "事后参数裁剪与嫁接，恢复微调后 MLLM 的通用能力。",
+      "libs": []
+    },
+    {
+      "name": "SMoLoRA",
+      "cat": "llm",
+      "year": 2024,
+      "venue": "arXiv 2024",
+      "note": "双门控 MoE-LoRA，缓解路由机制自身的遗忘。",
+      "libs": [
+        "MLLM"
+      ]
+    },
+    {
+      "name": "HiDe-LLaVA",
+      "cat": "llm",
+      "year": 2025,
+      "venue": "arXiv 2025",
+      "note": "层级解耦任务共享与任务特定模块的 MLLM 持续微调。",
+      "libs": [
+        "MLLM"
+      ]
+    },
+    {
+      "name": "OPD",
+      "cat": "llm",
+      "year": 0,
+      "venue": "框架实现",
+      "note": "在线策略蒸馏：学生在自身采样分布上对齐教师。",
+      "libs": [
+        "MLLM"
+      ]
+    },
+    {
+      "name": "Reflexion",
+      "cat": "agent",
+      "year": 2023,
+      "venue": "NeurIPS 2023",
+      "note": "语言反思作为强化信号的自我改进智能体。",
+      "libs": []
+    },
+    {
+      "name": "Voyager",
+      "cat": "agent",
+      "year": 2023,
+      "venue": "arXiv 2023",
+      "note": "技能库驱动的开放世界终身学习智能体。",
+      "libs": []
+    },
+    {
+      "name": "DISCO",
+      "cat": "ours",
+      "year": 0,
+      "venue": "框架实现",
+      "note": "每任务一个专家分支，按任务身份或路由选择。",
+      "libs": [
+        "MLLM"
+      ]
+    },
+    {
+      "name": "DKR",
+      "cat": "ours",
+      "year": 0,
+      "venue": "进行中",
+      "note": "蒸馏与知识保持方向的 CLIP 自研方法。",
+      "libs": [
+        "CLIP"
+      ]
+    },
+    {
+      "name": "MG-CLIP",
+      "cat": "ours",
+      "year": 0,
+      "venue": "进行中",
+      "note": "面向 CLIP 持续微调的自研改进方法。",
+      "libs": [
+        "CLIP"
+      ]
+    },
+    {
+      "name": "MODX",
+      "cat": "ours",
+      "year": 0,
+      "venue": "进行中",
+      "note": "模型扩展与合并方向的自研方法。",
+      "libs": [
+        "CLIP"
+      ]
+    },
+    {
+      "name": "MPrompt",
+      "cat": "ours",
+      "year": 0,
+      "venue": "框架实现",
+      "note": "视觉与语言分支的多模态软提示。",
+      "libs": [
+        "MLLM"
+      ]
+    },
+    {
+      "name": "PA2S (v1–v4)",
+      "cat": "ours",
+      "year": 0,
+      "venue": "进行中",
+      "note": "原型增广与自监督方向的类增量自研方法，库内保留各迭代版本。",
+      "libs": [
+        "CIL"
+      ]
+    },
+    {
+      "name": "SAME",
+      "cat": "ours",
+      "year": 0,
+      "venue": "框架实现",
+      "note": "按输入统计量自适应选择并组合既有专家。",
+      "libs": [
+        "MLLM"
+      ]
+    },
+    {
+      "name": "McCloskey & Cohen 灾难性干扰",
+      "cat": "origin",
+      "year": 1989,
+      "venue": "Psych. Learn. Motiv. 1989",
+      "note": "连接主义网络顺序学习中的灾难性干扰首次被系统刻画，持续学习问题的奠基文献。",
+      "libs": []
+    },
+    {
+      "name": "Stability Gap（持续评测）",
+      "cat": "origin",
+      "year": 2023,
+      "venue": "ICLR 2023",
+      "note": "逐迭代评测揭示任务切换瞬间旧任务性能的暂时坍塌与恢复；只在任务末评测会低估最坏情形。",
+      "libs": []
+    },
+    {
+      "name": "Loss of Plasticity",
+      "cat": "origin",
+      "year": 2024,
+      "venue": "Nature 2024",
+      "note": "长期持续训练使深度网络逐渐丧失学习新任务的能力；持续反向传播以随机重置低效单元维持可塑性。",
+      "libs": []
+    },
+    {
+      "name": "Parisi et al. 综述",
+      "cat": "survey",
+      "year": 2019,
+      "venue": "Neural Networks 2019",
+      "note": "持续终身学习的神经网络方法早期系统梳理。",
+      "libs": []
+    },
+    {
+      "name": "Biesialska et al. 综述",
+      "cat": "survey",
+      "year": 2020,
+      "venue": "COLING 2020",
+      "note": "自然语言处理视角的持续学习综述。",
+      "libs": []
+    },
+    {
+      "name": "De Lange et al. 综述",
+      "cat": "survey",
+      "year": 2021,
+      "venue": "TPAMI 2021",
+      "note": "任务增量方法的系统分类与公平比较框架。",
+      "libs": []
+    },
+    {
+      "name": "Masana et al. 综述",
+      "cat": "survey",
+      "year": 2022,
+      "venue": "TPAMI 2022",
+      "note": "类增量方法的系统评测与性能比较。",
+      "libs": []
+    },
+    {
+      "name": "van de Ven et al.",
+      "cat": "survey",
+      "year": 2022,
+      "venue": "Nat. Mach. Intell. 2022",
+      "note": "Task / Domain / Class-IL 三种设定的正式界定。",
+      "libs": []
+    },
+    {
+      "name": "Shi et al. 综述",
+      "cat": "survey",
+      "year": 2024,
+      "venue": "arXiv 2024",
+      "note": "大语言模型持续学习的全面综述。",
+      "libs": []
+    },
+    {
+      "name": "Wang et al. 综述",
+      "cat": "survey",
+      "year": 2024,
+      "venue": "TPAMI 2024",
+      "note": "持续学习理论、方法与应用的全景综述。",
+      "libs": []
+    },
+    {
+      "name": "Zhou et al. 综述",
+      "cat": "survey",
+      "year": 2024,
+      "venue": "TPAMI 2024",
+      "note": "类增量学习的最新系统综述。",
+      "libs": []
+    },
+    {
+      "name": "VLM 持续学习综述",
+      "cat": "survey",
+      "year": 2025,
+      "venue": "arXiv 2025",
+      "note": "视觉语言模型持续学习的分类法：跨模态漂移、零样本能力侵蚀等超越经典遗忘的失效模式。",
+      "libs": []
+    },
+    {
+      "name": "CORe50",
+      "cat": "bench",
+      "year": 2017,
+      "venue": "CoRL 2017",
+      "note": "连续物体识别的基准与协议。",
+      "libs": []
+    },
+    {
+      "name": "CLEAR",
+      "cat": "bench",
+      "year": 2021,
+      "venue": "NeurIPS 2021 D&B",
+      "note": "真实世界十年尺度分布漂移基准。",
+      "libs": []
+    },
+    {
+      "name": "CoIN",
+      "cat": "bench",
+      "year": 2024,
+      "venue": "NeurIPS 2024 D&B",
+      "note": "MLLM 持续指令微调基准：任务序列与通用知识评测。",
+      "libs": []
+    },
+    {
+      "name": "Avalanche",
+      "cat": "tool",
+      "year": 2021,
+      "venue": "CVPR-W 2021",
+      "note": "ContinualAI 的端到端持续学习库。",
+      "libs": []
+    },
+    {
+      "name": "PyCIL",
+      "cat": "tool",
+      "year": 2023,
+      "venue": "SCIS 2023",
+      "note": "类增量学习工具箱。",
+      "libs": []
+    },
+    {
+      "name": "CLightning",
+      "cat": "tool",
+      "year": 2026,
+      "venue": "GitHub",
+      "note": "本计划方法库套件：三库统一底座与评测。",
+      "libs": []
+    }
+  ]
+}

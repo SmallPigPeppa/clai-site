@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CLightCLIP · Continual Learning for AI</title>
+<meta name="description" content="视觉语言模型持续微调方法库：跨域任务序列，关切零样本迁移能力的保持。">
+<meta property="og:title" content="CLightCLIP · Continual Learning for AI">
+<meta property="og:description" content="视觉语言模型持续微调方法库：跨域任务序列，关切零样本迁移能力的保持。">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='1 0.4 18 17.2'><rect x='1' y='13' width='4.6' height='4.6' rx='1.1' fill='%232F4CD8'/><rect x='7.7' y='13' width='4.6' height='4.6' rx='1.1' fill='%232F4CD8'/><rect x='14.4' y='13' width='4.6' height='4.6' rx='1.1' fill='%232F4CD8'/><rect x='1' y='6.7' width='4.6' height='4.6' rx='1.1' fill='%236B8EE9'/><rect x='7.7' y='6.7' width='4.6' height='4.6' rx='1.1' fill='%236B8EE9'/><rect x='1' y='.4' width='4.6' height='4.6' rx='1.1' fill='%23A8C4F3'/></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=64629d96">
+<script>
+  // 在首次绘制前定主题，避免闪白
+  (() => {
+    try {
+      const saved = localStorage.getItem('cl-theme');
+      if (saved === 'dark' || saved === 'light') document.documentElement.dataset.theme = saved;
+    } catch (e) { /* 隐私模式下 localStorage 不可用 */ }
+  })();
+</script>
+</head>
+<body data-nav="libraries" data-base="../../">
+
+<!-- 氛围层：整页身后的辉光与颗粒，玻璃靠它显形 -->
+<div class="aura" aria-hidden="true"></div>
+
+<a class="skip" href="#main">跳到主要内容</a>
+
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4.5 12h15M13 5.5l6.5 6.5-6.5 6.5"/>
+  </symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 9.5l6 6 6-6"/>
+  </symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4L20 20"/>
+  </symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4.2"/>
+    <path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/>
+  </symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.5 14.3A8.8 8.8 0 1 1 9.7 3.5a7 7 0 0 0 10.8 10.8Z"/>
+  </symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+    <path d="M3.5 7h17M3.5 12h17M3.5 17h17"/>
+  </symbol>
+  <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+    <path d="M6 6l12 12M18 6L6 18"/>
+  </symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="8.5" y="8.5" width="11" height="11" rx="2.2"/>
+    <path d="M15.5 5.5A2 2 0 0 0 13.5 4h-7a2.5 2.5 0 0 0-2.5 2.5v7a2 2 0 0 0 1.5 1.94"/>
+  </symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4.5 12.5l5 5 10-11"/>
+  </symbol>
+  <symbol id="i-github" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 .5C5.7.5.6 5.6.6 11.9c0 5.05 3.27 9.33 7.81 10.84.57.11.78-.25.78-.55 0-.27-.01-1.17-.02-2.12-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.75 1.18 1.75 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.17-3.07-.12-.29-.51-1.45.11-3.03 0 0 .96-.31 3.15 1.17a10.9 10.9 0 0 1 5.74 0c2.18-1.48 3.14-1.17 3.14-1.17.62 1.58.23 2.74.12 3.03.73.8 1.17 1.82 1.17 3.07 0 4.39-2.68 5.36-5.23 5.64.41.36.78 1.06.78 2.13 0 1.54-.01 2.79-.01 3.16 0 .31.2.67.79.55a11.42 11.42 0 0 0 7.8-10.84C23.4 5.6 18.3.5 12 .5Z"/>
+  </symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13.5 4.5h6v6M19 5l-7.2 7.2M9.5 5.5H7A2.5 2.5 0 0 0 4.5 8v9A2.5 2.5 0 0 0 7 19.5h9a2.5 2.5 0 0 0 2.5-2.5v-2.5"/>
+  </symbol>
+  <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 4.8A1.8 1.8 0 0 1 5.8 3H11v16H5.8A1.8 1.8 0 0 0 4 20.8V4.8ZM20 4.8A1.8 1.8 0 0 0 18.2 3H13v16h5.2a1.8 1.8 0 0 1 1.8 1.8V4.8Z"/>
+  </symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3.5" y="3.5" width="17" height="17" rx="2"/>
+    <path d="M3.5 9.17h17M3.5 14.83h17M9.17 3.5v17M14.83 3.5v17"/>
+  </symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3l8.5 4.5L12 12 3.5 7.5 12 3ZM3.5 12.2 12 16.7l8.5-4.5M3.5 16.7 12 21.2l8.5-4.5"/>
+  </symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 20V4M4 20h16M8 20v-6M12.7 20V9M17.3 20v-9.5"/>
+  </symbol>
+  <symbol id="i-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="4.5" width="18" height="15" rx="2.2"/><path d="M7.5 10l3 2.8-3 2.8M13 15.8h4"/>
+  </symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9.5 3v6.2L4.6 17.4A2 2 0 0 0 6.3 20.5h11.4a2 2 0 0 0 1.7-3.1L14.5 9.2V3M8 3h8M7.2 14.5h9.6"/>
+  </symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13.5 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5L13.5 3Z"/>
+    <path d="M13.3 3.2v5.3H19M8.8 13h6.4M8.8 16.7h4.4"/>
+  </symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 11.5A7.5 7.5 0 0 1 17.4 6.8M20 12.5A7.5 7.5 0 0 1 6.6 17.2"/>
+    <path d="M17.6 3.4v3.6H14M6.4 20.6V17H10"/>
+  </symbol>
+</svg>
+<header class="site-head" id="site-head">
+  <div class="shell head-inner">
+
+    <a class="brand" href="../../" aria-label="CLightCLIP · Continual Learning for AI 首页">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="1 0.4 18 17.2" width="22" height="21">
+          <rect class="m-deep" x="1"    y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-deep" x="7.7"  y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-deep" x="14.4" y="13"  width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-mid"  x="1"    y="6.7" width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-mid"  x="7.7"  y="6.7" width="4.6" height="4.6" rx="1.1"/>
+          <rect class="m-lite" x="1"    y=".4"  width="4.6" height="4.6" rx="1.1"/>
+        </svg>
+      </span>
+      <svg class="wordmark" viewBox="45 -756 11439 964" aria-hidden="true" focusable="false">
+        <path class="wm-main" d="M332 14Q204 14 129 -58Q53 -131 53 -267V-433Q53 -569 129 -642Q204 -714 332 -714Q460 -714 529 -644Q598 -574 598 -452V-446H484V-456Q484 -524 447 -567Q410 -611 332 -611Q256 -611 212 -564Q169 -517 169 -435V-265Q169 -184 212 -137Q256 -89 332 -89Q410 -89 447 -133Q484 -177 484 -244V-262H598V-248Q598 -126 529 -56Q460 14 332 14Z M946 14Q872 14 814 -16Q756 -47 723 -104Q689 -160 689 -239V-254Q689 -333 723 -390Q756 -447 814 -477Q872 -508 946 -508Q1020 -508 1078 -477Q1136 -447 1169 -390Q1203 -333 1203 -254V-239Q1203 -160 1169 -104Q1136 -47 1078 -16Q1020 14 946 14ZM946 -84Q1011 -84 1052 -125Q1093 -167 1093 -242V-252Q1093 -326 1052 -368Q1012 -410 946 -410Q881 -410 840 -368Q799 -326 799 -252V-242Q799 -167 840 -125Q881 -84 946 -84Z M1323 0V-494H1431V-422H1448Q1461 -452 1496 -477Q1531 -502 1601 -502Q1658 -502 1701 -477Q1745 -451 1769 -405Q1794 -359 1794 -296V0H1684V-287Q1684 -349 1654 -379Q1623 -409 1568 -409Q1506 -409 1470 -368Q1433 -326 1433 -250V0Z M2107 0Q2060 0 2033 -28Q2005 -56 2005 -103V-402H1873V-494H2005V-654H2115V-494H2259V-402H2115V-122Q2115 -92 2143 -92H2244V0Z M2373 0V-494H2483V0Z M2628 0V-494H2736V-422H2753Q2766 -452 2801 -477Q2836 -502 2906 -502Q2963 -502 3006 -477Q3050 -451 3074 -405Q3099 -359 3099 -296V0H2989V-287Q2989 -349 2959 -379Q2928 -409 2873 -409Q2811 -409 2775 -368Q2738 -326 2738 -250V0Z M3420 8Q3363 8 3320 -17Q3276 -42 3251 -89Q3227 -135 3227 -198V-494H3337V-206Q3337 -144 3367 -115Q3398 -85 3453 -85Q3515 -85 3551 -126Q3588 -167 3588 -244V-494H3697V0H3590V-71H3573Q3560 -43 3525 -17Q3490 8 3420 8Z M3995 14Q3943 14 3901 -4Q3859 -23 3835 -58Q3810 -93 3810 -143Q3810 -194 3835 -227Q3859 -261 3902 -278Q3945 -296 3999 -296H4146V-326Q4146 -367 4121 -392Q4096 -417 4043 -417Q3992 -417 3966 -393Q3939 -369 3931 -331L3829 -364Q3841 -404 3867 -436Q3894 -468 3938 -488Q3982 -508 4045 -508Q4142 -508 4197 -459Q4252 -410 4252 -319V-121Q4252 -91 4280 -91H4322V0H4243Q4207 0 4185 -18Q4162 -36 4162 -67V-69H4146Q4139 -55 4124 -35Q4108 -15 4077 -1Q4047 14 3995 14ZM4013 -76Q4072 -76 4109 -110Q4146 -144 4146 -201V-212H4006Q3967 -212 3944 -195Q3920 -178 3920 -146Q3920 -114 3945 -95Q3969 -76 4013 -76Z M4415 0V-700H4525V0Z M4820 0V-700H4935V-105H5267V0Z M5587 14Q5513 14 5456 -18Q5400 -49 5369 -106Q5337 -164 5337 -241V-253Q5337 -330 5368 -387Q5399 -445 5455 -476Q5511 -508 5584 -508Q5655 -508 5709 -476Q5763 -445 5793 -388Q5823 -331 5823 -256V-216H5449Q5451 -155 5491 -119Q5531 -82 5590 -82Q5647 -82 5675 -107Q5703 -132 5717 -164L5808 -118Q5794 -90 5768 -59Q5741 -29 5698 -7Q5654 14 5587 14ZM5450 -299H5711Q5707 -351 5673 -381Q5638 -411 5583 -411Q5527 -411 5492 -381Q5458 -351 5450 -299Z M6092 14Q6040 14 5998 -4Q5956 -23 5932 -58Q5907 -93 5907 -143Q5907 -194 5932 -227Q5956 -261 5999 -278Q6042 -296 6096 -296H6243V-326Q6243 -367 6218 -392Q6193 -417 6140 -417Q6089 -417 6063 -393Q6036 -369 6028 -331L5926 -364Q5938 -404 5964 -436Q5991 -468 6035 -488Q6079 -508 6142 -508Q6239 -508 6294 -459Q6349 -410 6349 -319V-121Q6349 -91 6377 -91H6419V0H6340Q6304 0 6282 -18Q6259 -36 6259 -67V-69H6243Q6236 -55 6221 -35Q6205 -15 6174 -1Q6144 14 6092 14ZM6110 -76Q6169 -76 6206 -110Q6243 -144 6243 -201V-212H6103Q6064 -212 6041 -195Q6017 -178 6017 -146Q6017 -114 6042 -95Q6066 -76 6110 -76Z M6512 0V-494H6620V-436H6637Q6649 -467 6674 -481Q6700 -496 6738 -496H6797V-397H6735Q6685 -397 6654 -370Q6622 -344 6622 -287V0Z M6897 0V-494H7005V-422H7022Q7035 -452 7070 -477Q7105 -502 7175 -502Q7232 -502 7275 -477Q7319 -451 7343 -405Q7368 -359 7368 -296V0H7258V-287Q7258 -349 7228 -379Q7197 -409 7142 -409Q7080 -409 7044 -368Q7007 -326 7007 -250V0Z M7508 0V-494H7618V0Z M7763 0V-494H7871V-422H7888Q7901 -452 7936 -477Q7971 -502 8041 -502Q8098 -502 8141 -477Q8185 -451 8209 -405Q8234 -359 8234 -296V0H8124V-287Q8124 -349 8094 -379Q8063 -409 8008 -409Q7946 -409 7910 -368Q7873 -326 7873 -250V0Z M8350 -245V-260Q8350 -338 8382 -393Q8413 -448 8465 -478Q8516 -508 8578 -508Q8649 -508 8687 -482Q8724 -456 8741 -426H8758V-494H8865V97Q8865 144 8838 172Q8810 200 8763 200H8431V104H8727Q8756 104 8756 74V-75H8739Q8728 -57 8709 -39Q8690 -21 8658 -9Q8626 3 8578 3Q8516 3 8464 -27Q8412 -56 8381 -112Q8350 -167 8350 -245ZM8609 -93Q8673 -93 8715 -134Q8757 -175 8757 -248V-257Q8757 -331 8716 -371Q8674 -411 8609 -411Q8545 -411 8503 -371Q8461 -331 8461 -257V-248Q8461 -175 8503 -134Q8545 -93 8609 -93Z"/>
+        <path class="wm-dot" d="M2389 -748h78a42 42 0 0 1 42 42v78a42 42 0 0 1 -42 42h-78a42 42 0 0 1 -42 -42v-78a42 42 0 0 1 42 -42z M7524 -748h78a42 42 0 0 1 42 42v78a42 42 0 0 1 -42 42h-78a42 42 0 0 1 -42 -42v-78a42 42 0 0 1 42 -42z"/>
+        <path class="wm-for" d="M9271 0V-420H9121V-489H9271V-614Q9271 -654 9294 -677Q9316 -700 9358 -700H9481V-632H9380Q9350 -632 9350 -602V-489H9504V-420H9350V0Z M9821 14Q9747 14 9690 -17Q9634 -48 9602 -105Q9571 -161 9571 -238V-251Q9571 -327 9602 -384Q9634 -441 9690 -472Q9747 -503 9821 -503Q9895 -503 9951 -472Q10008 -441 10039 -384Q10071 -327 10071 -251V-238Q10071 -161 10039 -105Q10008 -48 9951 -17Q9895 14 9821 14ZM9821 -57Q9899 -57 9945 -106Q9992 -156 9992 -240V-249Q9992 -333 9945 -383Q9899 -432 9821 -432Q9744 -432 9697 -383Q9650 -333 9650 -249V-240Q9650 -156 9697 -106Q9744 -57 9821 -57Z M10215 0V-489H10292V-429H10306Q10319 -461 10346 -476Q10373 -491 10417 -491H10475V-419H10412Q10359 -419 10326 -389Q10294 -360 10294 -298V0Z"/>
+        <path class="wm-ai" d="M10682 0 10874 -700H11083L11275 0H11151L11109 -160H10848L10806 0ZM10876 -270H11081L10987 -625H10970Z M11356 0V-700H11477V0Z"/>
+      </svg>
+      <span class="sr-only">Continual Learning for AI</span>
+    </a>
+
+    <nav class="head-nav" aria-label="主导航">
+      <a class="nav-link" data-nav-key="learn" href="../../learn">背景介绍</a>
+
+      <div class="nav-group">
+        <button type="button" class="nav-link nav-trigger" data-nav-key="works evaluation leaderboard"
+                aria-expanded="false" aria-controls="menu-eval">
+          相关工作与榜单<svg class="ic caret" width="14" height="14" aria-hidden="true"><use href="#i-chevron"/></svg>
+        </button>
+        <div class="nav-menu" id="menu-eval" hidden>
+          <div class="nav-menu-grid one-col">
+            <a href="../../works">
+              <svg class="ic" width="18" height="18" aria-hidden="true"><use href="#i-book"/></svg>
+              <b>相关工作</b><span>方法、奠基文献、综述、基准与工具库</span>
+            </a>
+            <a href="../../leaderboard">
+              <svg class="ic" width="18" height="18" aria-hidden="true"><use href="#i-chart"/></svg>
+              <b>榜单</b><span>各问题设定下的评测口径与结果表</span>
+            </a>
+            <a href="../../evaluation">
+              <svg class="ic" width="18" height="18" aria-hidden="true"><use href="#i-grid"/></svg>
+              <b>评测协议</b><span>榜单的统一口径与有效性检查</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <button type="button" class="nav-link nav-trigger" data-nav-key="libraries agent"
+                aria-expanded="false" aria-controls="menu-proj">
+          我们的项目<svg class="ic caret" width="14" height="14" aria-hidden="true"><use href="#i-chevron"/></svg>
+        </button>
+        <div class="nav-menu" id="menu-proj" hidden>
+          <div class="nav-menu-grid one-col">
+            <a href="../../libraries">
+              <svg class="ic" width="18" height="18" aria-hidden="true"><use href="#i-flask"/></svg>
+              <b>CLightning</b><span>类别增量、域增量与持续指令微调方法库</span>
+            </a>
+            <a href="../../agent">
+              <svg class="ic" width="18" height="18" aria-hidden="true"><use href="#i-terminal"/></svg>
+              <b>CLAgent</b><span>以持续学习为核心能力的自进化智能体系统</span>
+            </a>
+            <a href="../../ocr">
+              <svg class="ic" width="18" height="18" aria-hidden="true"><use href="#i-doc"/></svg>
+              <b>CLOCR</b><span>版式、语种与年代漂移下的文字识别持续学习</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <a class="nav-link" data-nav-key="team" href="../../team">团队</a>
+    </nav>
+
+    <div class="head-tools">
+      <button type="button" class="tool search-tool" id="search-open" aria-label="全站检索">
+        <svg class="ic" width="15" height="15" aria-hidden="true"><use href="#i-search"/></svg>
+        <span>搜索</span><kbd>⌘K</kbd>
+      </button>
+      <button type="button" class="tool icon-only" id="theme-toggle" aria-label="切换配色主题">
+        <svg class="ic only-light" width="17" height="17" aria-hidden="true"><use href="#i-moon"/></svg>
+        <svg class="ic only-dark" width="17" height="17" aria-hidden="true"><use href="#i-sun"/></svg>
+      </button>
+      <a class="tool icon-only repo" href="#" title="仓库地址待发布" aria-label="GitHub 仓库（待发布）">
+        <svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-github"/></svg>
+      </a>
+      <button type="button" class="tool icon-only menu-toggle" id="menu-toggle"
+              aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobile-nav">
+        <svg class="ic only-closed" width="19" height="19" aria-hidden="true"><use href="#i-menu"/></svg>
+        <svg class="ic only-open" width="19" height="19" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <nav class="mobile-nav" id="mobile-nav" aria-label="移动端导航" hidden>
+    <div class="shell">
+      <p class="m-group">背景介绍</p>
+      <a href="../../learn">持续学习入门</a>
+      <p class="m-group">相关工作与榜单</p>
+      <a href="../../works">相关工作</a>
+      <a href="../../leaderboard">榜单</a>
+      <a href="../../evaluation">评测协议</a>
+      <p class="m-group">我们的项目</p>
+      <a href="../../libraries">CLightning</a>
+      <a href="../../agent">CLAgent</a>
+      <a href="../../ocr">CLOCR</a>
+      <p class="m-group">关于</p>
+      <a href="../../team">团队</a>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+<section class="page-head">
+  <div class="shell">
+    <p class="crumb"><a href="../../">首页</a><span>/</span><a href="../../libraries">CLightning</a><span>/</span><span>CLightCLIP</span></p>
+    <h1>CLightCLIP<span class="en">Continual Learning for CLIP</span></h1>
+    <p class="lede">CLIP 视觉语言模型的持续学习库。在跨域任务序列上持续微调 CLIP，并以零样本迁移能力的保持为核心评测关切——预训练能力本身即是需要不被遗忘的「旧任务」。</p>
+    <div class="facts">
+      <span>跨域任务序列</span>
+      <span>CLIP ViT-B/16</span>
+      <span>零样本保持评测</span>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="shell">
+    <div class="sec-head">
+      <p class="eyebrow">任务序列</p>
+      <h2>跨域任务序列</h2>
+      <p>序列跨越通用图文、细粒度识别与艺术风格等领域，域间分布差异构成对零样本能力的持续冲击；每个域亦可单独作为单阶段（1stage）设定运行。</p>
+    </div>
+
+    <div class="grid grid-4">
+      <div class="card card--hover" data-reveal>
+        <span class="stage-k">STAGE 1–2</span>
+        <b class="card-title">COCO · Flickr30k</b>
+        <p>通用图文对齐：日常场景的图像描述与检索。</p>
+      </div>
+      <div class="card card--hover" data-reveal>
+        <span class="stage-k">STAGE 3–4</span>
+        <b class="card-title">Food500Cap · KREAM</b>
+        <p>细粒度领域：食品描述与商品图文。</p>
+      </div>
+      <div class="card card--hover" data-reveal>
+        <span class="stage-k">STAGE 5–6</span>
+        <b class="card-title">Lexica · Pet</b>
+        <p>生成图像域与宠物细粒度识别。</p>
+      </div>
+      <div class="card card--hover" data-reveal>
+        <span class="stage-k">STAGE 7–8</span>
+        <b class="card-title">TextCaps · WikiArt</b>
+        <p>场景文字理解与艺术风格域。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--tint">
+  <div class="shell">
+    <div class="sec-head">
+      <p class="eyebrow">方法</p>
+      <h2>基线、正则化移植与零样本保持</h2>
+      <p>含全参微调与 LoRA 两条基线、经典正则化方法在双塔结构上的移植，以及面向零样本保持的蒸馏与合并方法。</p>
+    </div>
+
+    <div class="table-scroll">
+      <table class="doc">
+        <thead><tr><th style="width:150px">方法</th><th>机制概述</th><th style="width:200px">文献依据</th></tr></thead>
+        <tbody>
+          <tr class="group"><td colspan="3">基线</td></tr>
+          <tr><td class="mono">sft</td><td class="dim">顺序全参微调，不施加抗遗忘约束；遗忘下界基线。</td><td class="mono">—</td></tr>
+          <tr><td class="mono">lora</td><td class="dim">低秩适配微调基线，图像塔与文本塔分设学习率。</td><td class="mono">Hu et al., 2021</td></tr>
+          <tr class="group"><td colspan="3">正则化移植</td></tr>
+          <tr><td class="mono">ewc</td><td class="dim">Fisher 重要性惩罚在双塔参数上的移植。</td><td class="mono">Kirkpatrick et al., 2017</td></tr>
+          <tr><td class="mono">lwf</td><td class="dim">旧模型软目标蒸馏在图文对比目标上的移植。</td><td class="mono">Li &amp; Hoiem, 2016</td></tr>
+          <tr class="group"><td colspan="3">零样本保持与自研方法</td></tr>
+          <tr><td class="mono">zscl</td><td class="dim">以参照数据蒸馏约束特征空间，防止零样本迁移能力在持续微调中退化。</td><td class="mono">Zheng et al., 2023</td></tr>
+          <tr><td class="mono">cclip</td><td class="dim">持续 CLIP 微调方法，结合权重合并系数（merge_alpha）控制新旧模型插值。</td><td class="mono">框架实现</td></tr>
+          <tr><td class="mono">dkr</td><td class="dim">自研方法：蒸馏与知识保持方向。机制说明将随论文公开。</td><td class="mono">进行中</td></tr>
+          <tr><td class="mono">mgclip</td><td class="dim">自研方法：面向 CLIP 的持续微调改进。机制说明将随论文公开。</td><td class="mono">进行中</td></tr>
+          <tr><td class="mono">modx</td><td class="dim">自研方法：模型扩展与合并方向。机制说明将随论文公开。</td><td class="mono">进行中</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="shell">
+    <div class="split">
+      <div>
+        <h3 class="sub-head">配置示例</h3>
+        <p class="prose">入口为 <code>main.py</code>；每方法一份 YAML，声明骨干、微调模式与双塔学习率。右侧为 <code>configs/8stage/cclip.yaml</code> 的节选。</p>
+      </div>
+      <div class="code" data-reveal>
+        <div class="code-bar">
+          <span class="code-name">configs/8stage/cclip.yaml</span>
+          <button type="button" class="code-copy" aria-label="复制配置">
+            <svg class="ic ic-copy" width="14" height="14" aria-hidden="true"><use href="#i-copy"/></svg>
+            <svg class="ic ic-check" width="14" height="14" aria-hidden="true"><use href="#i-check"/></svg>
+          </button>
+        </div>
+        <div class="code-pane" data-pane="yaml"><pre><span class="tk-key">model</span>:
+  <span class="tk-key">backbone</span>: <span class="tk-str">openai/clip-vit-base-patch16</span>
+  <span class="tk-key">method</span>: <span class="tk-str">cclip</span>
+  <span class="tk-key">tuning_mode</span>: <span class="tk-str">full</span>
+  <span class="tk-key">image_lr</span>: <span class="tk-num">2.0e-5</span>
+  <span class="tk-key">text_lr</span>: <span class="tk-num">2.0e-5</span>
+  <span class="tk-key">weight_decay</span>: <span class="tk-num">0.2</span>
+  <span class="tk-key">merge_alpha</span>: <span class="tk-num">0.5</span>
+<span class="tk-key">data</span>:
+  <span class="tk-key">root_dir</span>: <span class="tk-str">~/datasets</span>
+  <span class="tk-key">image_size</span>: <span class="tk-num">224</span>
+  <span class="tk-key">max_length</span>: <span class="tk-num">77</span></pre></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="shell">
+    <div class="foot-top">
+      <div class="foot-about">
+        <span class="brand-mark sm" aria-hidden="true">
+          <svg viewBox="0 0 20 20" width="18" height="18">
+            <rect x="1"    y="13"  width="4.6" height="4.6" rx="1.1"/>
+            <rect x="7.7"  y="13"  width="4.6" height="4.6" rx="1.1"/>
+            <rect x="14.4" y="13"  width="4.6" height="4.6" rx="1.1"/>
+            <rect x="1"    y="6.7" width="4.6" height="4.6" rx="1.1" opacity=".6"/>
+            <rect x="7.7"  y="6.7" width="4.6" height="4.6" rx="1.1" opacity=".6"/>
+            <rect x="1"    y=".4"  width="4.6" height="4.6" rx="1.1" opacity=".28"/>
+          </svg>
+        </span>
+        <p class="foot-name">
+          <svg class="wordmark" viewBox="45 -756 11439 964" aria-hidden="true" focusable="false">
+            <path class="wm-main" d="M332 14Q204 14 129 -58Q53 -131 53 -267V-433Q53 -569 129 -642Q204 -714 332 -714Q460 -714 529 -644Q598 -574 598 -452V-446H484V-456Q484 -524 447 -567Q410 -611 332 -611Q256 -611 212 -564Q169 -517 169 -435V-265Q169 -184 212 -137Q256 -89 332 -89Q410 -89 447 -133Q484 -177 484 -244V-262H598V-248Q598 -126 529 -56Q460 14 332 14Z M946 14Q872 14 814 -16Q756 -47 723 -104Q689 -160 689 -239V-254Q689 -333 723 -390Q756 -447 814 -477Q872 -508 946 -508Q1020 -508 1078 -477Q1136 -447 1169 -390Q1203 -333 1203 -254V-239Q1203 -160 1169 -104Q1136 -47 1078 -16Q1020 14 946 14ZM946 -84Q1011 -84 1052 -125Q1093 -167 1093 -242V-252Q1093 -326 1052 -368Q1012 -410 946 -410Q881 -410 840 -368Q799 -326 799 -252V-242Q799 -167 840 -125Q881 -84 946 -84Z M1323 0V-494H1431V-422H1448Q1461 -452 1496 -477Q1531 -502 1601 -502Q1658 -502 1701 -477Q1745 -451 1769 -405Q1794 -359 1794 -296V0H1684V-287Q1684 -349 1654 -379Q1623 -409 1568 -409Q1506 -409 1470 -368Q1433 -326 1433 -250V0Z M2107 0Q2060 0 2033 -28Q2005 -56 2005 -103V-402H1873V-494H2005V-654H2115V-494H2259V-402H2115V-122Q2115 -92 2143 -92H2244V0Z M2373 0V-494H2483V0Z M2628 0V-494H2736V-422H2753Q2766 -452 2801 -477Q2836 -502 2906 -502Q2963 -502 3006 -477Q3050 -451 3074 -405Q3099 -359 3099 -296V0H2989V-287Q2989 -349 2959 -379Q2928 -409 2873 -409Q2811 -409 2775 -368Q2738 -326 2738 -250V0Z M3420 8Q3363 8 3320 -17Q3276 -42 3251 -89Q3227 -135 3227 -198V-494H3337V-206Q3337 -144 3367 -115Q3398 -85 3453 -85Q3515 -85 3551 -126Q3588 -167 3588 -244V-494H3697V0H3590V-71H3573Q3560 -43 3525 -17Q3490 8 3420 8Z M3995 14Q3943 14 3901 -4Q3859 -23 3835 -58Q3810 -93 3810 -143Q3810 -194 3835 -227Q3859 -261 3902 -278Q3945 -296 3999 -296H4146V-326Q4146 -367 4121 -392Q4096 -417 4043 -417Q3992 -417 3966 -393Q3939 -369 3931 -331L3829 -364Q3841 -404 3867 -436Q3894 -468 3938 -488Q3982 -508 4045 -508Q4142 -508 4197 -459Q4252 -410 4252 -319V-121Q4252 -91 4280 -91H4322V0H4243Q4207 0 4185 -18Q4162 -36 4162 -67V-69H4146Q4139 -55 4124 -35Q4108 -15 4077 -1Q4047 14 3995 14ZM4013 -76Q4072 -76 4109 -110Q4146 -144 4146 -201V-212H4006Q3967 -212 3944 -195Q3920 -178 3920 -146Q3920 -114 3945 -95Q3969 -76 4013 -76Z M4415 0V-700H4525V0Z M4820 0V-700H4935V-105H5267V0Z M5587 14Q5513 14 5456 -18Q5400 -49 5369 -106Q5337 -164 5337 -241V-253Q5337 -330 5368 -387Q5399 -445 5455 -476Q5511 -508 5584 -508Q5655 -508 5709 -476Q5763 -445 5793 -388Q5823 -331 5823 -256V-216H5449Q5451 -155 5491 -119Q5531 -82 5590 -82Q5647 -82 5675 -107Q5703 -132 5717 -164L5808 -118Q5794 -90 5768 -59Q5741 -29 5698 -7Q5654 14 5587 14ZM5450 -299H5711Q5707 -351 5673 -381Q5638 -411 5583 -411Q5527 -411 5492 -381Q5458 -351 5450 -299Z M6092 14Q6040 14 5998 -4Q5956 -23 5932 -58Q5907 -93 5907 -143Q5907 -194 5932 -227Q5956 -261 5999 -278Q6042 -296 6096 -296H6243V-326Q6243 -367 6218 -392Q6193 -417 6140 -417Q6089 -417 6063 -393Q6036 -369 6028 -331L5926 -364Q5938 -404 5964 -436Q5991 -468 6035 -488Q6079 -508 6142 -508Q6239 -508 6294 -459Q6349 -410 6349 -319V-121Q6349 -91 6377 -91H6419V0H6340Q6304 0 6282 -18Q6259 -36 6259 -67V-69H6243Q6236 -55 6221 -35Q6205 -15 6174 -1Q6144 14 6092 14ZM6110 -76Q6169 -76 6206 -110Q6243 -144 6243 -201V-212H6103Q6064 -212 6041 -195Q6017 -178 6017 -146Q6017 -114 6042 -95Q6066 -76 6110 -76Z M6512 0V-494H6620V-436H6637Q6649 -467 6674 -481Q6700 -496 6738 -496H6797V-397H6735Q6685 -397 6654 -370Q6622 -344 6622 -287V0Z M6897 0V-494H7005V-422H7022Q7035 -452 7070 -477Q7105 -502 7175 -502Q7232 -502 7275 -477Q7319 -451 7343 -405Q7368 -359 7368 -296V0H7258V-287Q7258 -349 7228 -379Q7197 -409 7142 -409Q7080 -409 7044 -368Q7007 -326 7007 -250V0Z M7508 0V-494H7618V0Z M7763 0V-494H7871V-422H7888Q7901 -452 7936 -477Q7971 -502 8041 -502Q8098 -502 8141 -477Q8185 -451 8209 -405Q8234 -359 8234 -296V0H8124V-287Q8124 -349 8094 -379Q8063 -409 8008 -409Q7946 -409 7910 -368Q7873 -326 7873 -250V0Z M8350 -245V-260Q8350 -338 8382 -393Q8413 -448 8465 -478Q8516 -508 8578 -508Q8649 -508 8687 -482Q8724 -456 8741 -426H8758V-494H8865V97Q8865 144 8838 172Q8810 200 8763 200H8431V104H8727Q8756 104 8756 74V-75H8739Q8728 -57 8709 -39Q8690 -21 8658 -9Q8626 3 8578 3Q8516 3 8464 -27Q8412 -56 8381 -112Q8350 -167 8350 -245ZM8609 -93Q8673 -93 8715 -134Q8757 -175 8757 -248V-257Q8757 -331 8716 -371Q8674 -411 8609 -411Q8545 -411 8503 -371Q8461 -331 8461 -257V-248Q8461 -175 8503 -134Q8545 -93 8609 -93Z"/>
+            <path class="wm-dot" d="M2389 -748h78a42 42 0 0 1 42 42v78a42 42 0 0 1 -42 42h-78a42 42 0 0 1 -42 -42v-78a42 42 0 0 1 42 -42z M7524 -748h78a42 42 0 0 1 42 42v78a42 42 0 0 1 -42 42h-78a42 42 0 0 1 -42 -42v-78a42 42 0 0 1 42 -42z"/>
+            <path class="wm-for" d="M9271 0V-420H9121V-489H9271V-614Q9271 -654 9294 -677Q9316 -700 9358 -700H9481V-632H9380Q9350 -632 9350 -602V-489H9504V-420H9350V0Z M9821 14Q9747 14 9690 -17Q9634 -48 9602 -105Q9571 -161 9571 -238V-251Q9571 -327 9602 -384Q9634 -441 9690 -472Q9747 -503 9821 -503Q9895 -503 9951 -472Q10008 -441 10039 -384Q10071 -327 10071 -251V-238Q10071 -161 10039 -105Q10008 -48 9951 -17Q9895 14 9821 14ZM9821 -57Q9899 -57 9945 -106Q9992 -156 9992 -240V-249Q9992 -333 9945 -383Q9899 -432 9821 -432Q9744 -432 9697 -383Q9650 -333 9650 -249V-240Q9650 -156 9697 -106Q9744 -57 9821 -57Z M10215 0V-489H10292V-429H10306Q10319 -461 10346 -476Q10373 -491 10417 -491H10475V-419H10412Q10359 -419 10326 -389Q10294 -360 10294 -298V0Z"/>
+            <path class="wm-ai" d="M10682 0 10874 -700H11083L11275 0H11151L11109 -160H10848L10806 0ZM10876 -270H11081L10987 -625H10970Z M11356 0V-700H11477V0Z"/>
+          </svg>
+          <span class="sr-only">Continual Learning for AI</span>
+        </p>
+        <p class="foot-desc">
+          持续学习的背景介绍、相关工作与榜单，以及 CLightning、CLAgent 与 CLOCR 研究项目。全部结果建立在统一的 CL 矩阵评测口径上，站点内容随研究进展修订。
+        </p>
+      </div>
+
+      <div class="foot-cols">
+        <div>
+          <h2>背景介绍</h2>
+          <a href="../../learn">持续学习入门</a>
+          <a href="../../learn#settings">问题设定</a>
+          <a href="../../learn#families">方法谱系</a>
+        </div>
+        <div>
+          <h2>相关工作与榜单</h2>
+          <a href="../../works">相关工作</a>
+          <a href="../../leaderboard">榜单</a>
+          <a href="../../evaluation">评测协议</a>
+        </div>
+        <div>
+          <h2>我们的项目</h2>
+          <a href="../../libraries">CLightning</a>
+          <a href="../../agent">CLAgent</a>
+          <a href="../../ocr">CLOCR</a>
+        </div>
+        <div>
+          <h2>关于</h2>
+          <a href="../../team">团队</a>
+          <a href="../../libraries#cite">引用</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot-bottom">
+      <span>© 2026 Continual Learning for AI · 文本内容以 CC BY-NC-SA 4.0 发布</span>
+      <span>勘误与补充：欢迎通过 Issue / PR 提交</span>
+    </div>
+  </div>
+</footer>
+<div class="palette" id="palette" hidden>
+  <div class="palette-scrim" data-palette-close></div>
+  <div class="palette-panel" role="dialog" aria-modal="true" aria-label="全站检索">
+    <div class="palette-input">
+      <svg class="ic" width="17" height="17" aria-hidden="true"><use href="#i-search"/></svg>
+      <input id="palette-input" type="search" placeholder="搜索页面、方法或论文…" autocomplete="off" spellcheck="false"
+             role="combobox" aria-expanded="true" aria-controls="palette-list" aria-autocomplete="list">
+      <button type="button" class="palette-esc" data-palette-close>esc</button>
+    </div>
+    <ul class="palette-list" id="palette-list" role="listbox" aria-label="检索结果"></ul>
+    <div class="palette-foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
+      <span><kbd>↵</kbd> 打开</span>
+      <span><kbd>esc</kbd> 关闭</span>
+    </div>
+  </div>
+</div>
+
+<script src="../../assets/site.js?v=a037c3d1" defer></script>
+
+</body>
+</html>
