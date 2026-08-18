@@ -76,10 +76,19 @@
   const rowsOf = (name) => (data[name] && data[name].rows) || [];
   const val = (row, id) => (row.metrics && typeof row.metrics[id] === 'number' ? row.metrics[id] : null);
 
-  // 任一设定有了收录结果，页首的「尚无收录结果」提示即撤下
-  if (Object.keys(BENCH).some((name) => rowsOf(name).length)) {
-    const note = document.getElementById('bench-empty-note');
-    if (note) note.remove();
+  // 任一设定有了收录结果，页首的「尚无收录结果」提示即撤下；但若这批数值是示意
+  // 数据（results.json 的 provisional），提示换成出处说明继续挂着——占位数字不能
+  // 借着表格的形式冒充实测结果
+  const provisional = Object.keys(BENCH).some((name) => (data[name] || {}).provisional);
+  const headNote = document.getElementById('bench-empty-note');
+  if (headNote && Object.keys(BENCH).some((name) => rowsOf(name).length)) {
+    if (provisional) {
+      headNote.innerHTML = '<div><b>示意数据</b>下表数值为占位示意，仅用于展示榜单的结构、'
+        + `分组与排序交互；在实测结果通过<a href="${base}evaluation#checks">协议核查</a>并发布之前，`
+        + '本页不构成任何方法之间比较的依据。</div>';
+    } else {
+      headNote.remove();
+    }
   }
 
   host.innerHTML = Object.entries(BENCH).map(([name, spec], i) => `

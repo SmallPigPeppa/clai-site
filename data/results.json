@@ -1,11 +1,43 @@
 {
   "cil": {
-    "rows": []
+    "provisional": true,
+    "rows": [
+      { "method": "DER (CIL)", "family": "结构扩展", "venue": "CVPR 2021", "backbone": "ResNet-18", "benchmark": "CIFAR-100 · B0 · 10 步 · 示意数据", "metrics": { "acc": 68.4, "aia": 74.2, "f": 8.6 } },
+      { "method": "PODNet", "family": "回放", "venue": "ECCV 2020", "backbone": "ResNet-18", "benchmark": "CIFAR-100 · B0 · 10 步 · 示意数据", "metrics": { "acc": 64.7, "aia": 71.5, "f": 11.2 } },
+      { "method": "WA", "family": "回放", "venue": "CVPR 2020", "backbone": "ResNet-18", "benchmark": "CIFAR-100 · B0 · 10 步 · 示意数据", "metrics": { "acc": 63.9, "aia": 70.8, "f": 12.0 } },
+      { "method": "UCIR", "family": "回放", "venue": "CVPR 2019", "backbone": "ResNet-18", "benchmark": "CIFAR-100 · B0 · 10 步 · 示意数据", "metrics": { "acc": 62.1, "aia": 69.4, "f": 13.5 } },
+      { "method": "iCaRL", "family": "回放", "venue": "CVPR 2017", "backbone": "ResNet-18", "benchmark": "CIFAR-100 · B0 · 10 步 · 示意数据", "metrics": { "acc": 60.3, "aia": 67.9, "f": 15.1 } },
+      { "method": "SSRE", "family": "非样本", "venue": "CVPR 2022", "backbone": "ResNet-18", "benchmark": "CIFAR-100 · B0 · 10 步 · 示意数据", "tags": ["非样本"], "metrics": { "acc": 57.8, "aia": 65.2, "f": 17.4 } },
+      { "method": "IL2A", "family": "非样本", "venue": "NeurIPS 2021", "backbone": "ResNet-18", "benchmark": "CIFAR-100 · B0 · 10 步 · 示意数据", "tags": ["非样本"], "metrics": { "acc": 55.6, "aia": 63.1, "f": 19.2 } },
+      { "method": "LwF", "family": "正则化", "venue": "ECCV 2016", "backbone": "ResNet-18", "benchmark": "CIFAR-100 · B0 · 10 步 · 示意数据", "tags": ["非样本"], "metrics": { "acc": 48.2, "aia": 57.6, "f": 26.8 } },
+      { "method": "EWC", "family": "正则化", "venue": "PNAS 2017", "backbone": "ResNet-18", "benchmark": "CIFAR-100 · B0 · 10 步 · 示意数据", "tags": ["非样本"], "metrics": { "acc": 41.5, "aia": 52.3, "f": 33.7 } }
+    ]
   },
   "clip": {
-    "rows": []
+    "provisional": true,
+    "rows": [
+      { "method": "CCLIP", "family": "CLIP / VLM", "backbone": "CLIP ViT-B/16", "benchmark": "跨域 8 任务序列 · 示意数据", "metrics": { "acc": 62.8, "aia": 68.4, "bwt": -4.2, "zs": 58.9 } },
+      { "method": "DKR", "family": "自研", "backbone": "CLIP ViT-B/16", "benchmark": "跨域 8 任务序列 · 示意数据", "metrics": { "acc": 61.5, "aia": 67.2, "bwt": -5.1, "zs": 57.3 } },
+      { "method": "MG-CLIP", "family": "自研", "backbone": "CLIP ViT-B/16", "benchmark": "跨域 8 任务序列 · 示意数据", "metrics": { "acc": 60.2, "aia": 66.1, "bwt": -5.8, "zs": 56.4 } },
+      { "method": "MODX", "family": "自研", "backbone": "CLIP ViT-B/16", "benchmark": "跨域 8 任务序列 · 示意数据", "metrics": { "acc": 58.7, "aia": 64.8, "bwt": -6.9, "zs": 54.8 } },
+      { "method": "ZSCL", "family": "CLIP / VLM", "venue": "ICCV 2023", "backbone": "CLIP ViT-B/16", "benchmark": "跨域 8 任务序列 · 示意数据", "metrics": { "acc": 57.4, "aia": 63.6, "bwt": -7.6, "zs": 53.1 } },
+      { "method": "LwF", "family": "正则化", "venue": "ECCV 2016", "backbone": "CLIP ViT-B/16", "benchmark": "跨域 8 任务序列 · 示意数据", "metrics": { "acc": 51.2, "aia": 58.9, "bwt": -12.4, "zs": 44.7 } },
+      { "method": "EWC", "family": "正则化", "venue": "PNAS 2017", "backbone": "CLIP ViT-B/16", "benchmark": "跨域 8 任务序列 · 示意数据", "metrics": { "acc": 47.8, "aia": 56.1, "bwt": -15.3, "zs": 40.2 } }
+    ]
   },
   "tune": {
-    "rows": []
+    "provisional": true,
+    "rows": [
+      { "method": "HiDe-LLaVA", "family": "LLM / MLLM", "venue": "arXiv 2025", "backbone": "LLaVA-1.5-7B", "benchmark": "CoIN · 8 任务序列 · 示意数据", "metrics": { "acc": 66.2, "aia": 71.8, "bwt": -3.4, "f": 9.1, "gen": 88.6 } },
+      { "method": "SAME", "family": "自研", "backbone": "LLaVA-1.5-7B", "benchmark": "CoIN · 8 任务序列 · 示意数据", "metrics": { "acc": 65.4, "aia": 71.0, "bwt": -3.9, "f": 9.8, "gen": 87.9 } },
+      { "method": "DISCO", "family": "自研", "backbone": "LLaVA-1.5-7B", "benchmark": "CoIN · 8 任务序列 · 示意数据", "metrics": { "acc": 64.1, "aia": 69.7, "bwt": -4.6, "f": 11.2, "gen": 86.4 } },
+      { "method": "SMoLoRA", "family": "LLM / MLLM", "venue": "arXiv 2024", "backbone": "LLaVA-1.5-7B", "benchmark": "CoIN · 8 任务序列 · 示意数据", "metrics": { "acc": 62.8, "aia": 68.5, "bwt": -5.4, "f": 12.6, "gen": 85.1 } },
+      { "method": "MPrompt", "family": "自研", "backbone": "LLaVA-1.5-7B", "benchmark": "CoIN · 8 任务序列 · 示意数据", "metrics": { "acc": 61.3, "aia": 67.2, "bwt": -6.1, "f": 13.8, "gen": 84.2 } },
+      { "method": "MoELoRA (CoIN)", "family": "LLM / MLLM", "venue": "arXiv 2024", "backbone": "LLaVA-1.5-7B", "benchmark": "CoIN · 8 任务序列 · 示意数据", "metrics": { "acc": 59.7, "aia": 65.9, "bwt": -7.2, "f": 15.4, "gen": 82.7 } },
+      { "method": "O-LoRA", "family": "提示 / PEFT", "venue": "EMNLP Findings 2023", "backbone": "LLaVA-1.5-7B", "benchmark": "CoIN · 8 任务序列 · 示意数据", "metrics": { "acc": 57.2, "aia": 63.8, "bwt": -8.9, "f": 17.6, "gen": 80.9 } },
+      { "method": "OPD", "family": "LLM / MLLM", "backbone": "LLaVA-1.5-7B", "benchmark": "CoIN · 8 任务序列 · 示意数据", "metrics": { "acc": 55.8, "aia": 62.4, "bwt": -9.8, "f": 19.1, "gen": 79.3 } },
+      { "method": "LwF", "family": "正则化", "venue": "ECCV 2016", "backbone": "LLaVA-1.5-7B", "benchmark": "CoIN · 8 任务序列 · 示意数据", "metrics": { "acc": 51.4, "aia": 58.7, "bwt": -13.2, "f": 24.5, "gen": 74.6 } },
+      { "method": "EWC", "family": "正则化", "venue": "PNAS 2017", "backbone": "LLaVA-1.5-7B", "benchmark": "CoIN · 8 任务序列 · 示意数据", "metrics": { "acc": 48.6, "aia": 56.3, "bwt": -15.8, "f": 27.9, "gen": 71.2 } }
+    ]
   }
 }

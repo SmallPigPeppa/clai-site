@@ -262,14 +262,25 @@ const HOME_REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const badge = root.querySelector('[data-board-badge]');
   const note = root.querySelector('[data-board-note]');
   const emptyNote = note ? note.textContent : '';
+  const emptyBadge = badge ? badge.textContent : '';
 
-  // 徽记与脚注跟随当前设定的收录状态：无结果亮「待发布」，有结果说明是节选。
+  // 徽记与脚注跟随当前设定的收录状态：无结果亮「待发布」，有实测结果时收起徽记、
+  // 脚注说明是节选；数值为示意数据时徽记改亮「示意数据」并在脚注写明出处——
+  // 占位数字任何时候都不以实测的名义出现。
   // .badge 自带 display，hidden 属性会被压掉，须用行内 style 收起
   const sync = () => {
     const active = panes.find((p) => !p.hidden);
     const has = !!(active && active.dataset.hasRows);
-    if (badge) badge.style.display = has ? 'none' : '';
-    if (note) note.textContent = has ? '按 ACC 排序的节选' : emptyNote;
+    const prov = !!(active && active.dataset.provisional);
+    if (badge) {
+      badge.style.display = has && !prov ? 'none' : '';
+      badge.textContent = has && prov ? '示意数据' : emptyBadge;
+    }
+    if (note) {
+      note.textContent = !has ? emptyNote
+        : prov ? '示意数据：占位数值仅展示榜单结构，不构成方法比较依据'
+        : '按 ACC 排序的节选';
+    }
   };
 
   chips.forEach((chip) => chip.addEventListener('click', () => {
@@ -335,6 +346,7 @@ const HOME_REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
           </div>
         </div>`);
       pane.dataset.hasRows = '1';
+      if (data[pane.dataset.pane].provisional) pane.dataset.provisional = '1';
     });
     sync();
   })();

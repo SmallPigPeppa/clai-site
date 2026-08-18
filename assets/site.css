@@ -1,5 +1,5 @@
 /* ============================================================================
-   Continual Learning for AI — 设计系统
+   Continual Learning Lab — 设计系统
    ----------------------------------------------------------------------------
    1  令牌      色板 / 字阶 / 间距 / 圆角 / 阴影 / 动效
    2  基础      重置 · 排版 · 链接 · 焦点
@@ -837,10 +837,9 @@ body.is-menu-open .site-head .head-inner::before {
 /* 定制字标：Space Grotesk 矢量轮廓，i 点为呼应方块 Logo 的圆角方块 */
 .wordmark { display: block; height: 17px; width: auto; }
 .wm-main { fill: var(--ink); }
-.wm-for  { fill: var(--ink-3); }
-.wm-ai,
+.wm-lab,
 .wm-dot  { fill: var(--brand); transition: fill var(--t-fast) var(--ease-io); }
-.brand:hover .wm-ai,
+.brand:hover .wm-lab,
 .brand:hover .wm-dot { fill: var(--brand-hover); }
 
 .head-nav {
